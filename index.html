@@ -1,11 +1,15 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Dosimetria da Pena</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Hanken+Grotesk:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: faixa de abertura em azul-meia-noite com filetes dourados e as três fases do art. 68; abaixo, formulário em porcelana à esquerda e cartão de resultado escuro, fixo, à direita. */
+/* Layout: faixa de abertura em azul-meia-noite com filetes dourados; cada fase do art. 68 tem formulário em porcelana à esquerda e cartão de resultado escuro, fixo, à direita; o módulo de exercícios ocupa a largura toda ao final. */
 :root {
   --paper: #F5F3EE;
   --surface: #FDFCFA;
@@ -24,6 +28,10 @@
   --glow: rgba(214, 186, 135, .16);
   --warn: #8C4A1E;
   --warn-soft: #F7E9DE;
+  --alert: #B42318;
+  --alert-ink: #912018;
+  --alert-soft: #FDEDEB;
+  --ok: #2F7A4F;
   --track: #2A3650;
   --f-display: "Cormorant Garamond", "Cormorant", Garamond, "Times New Roman", serif;
   --f-body: "Hanken Grotesk", "Helvetica Neue", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -33,7 +41,8 @@
     --paper: #0A101B; --surface: #111927; --ink: #ECE6D9; --muted: #9EA3AD; --line: #252F41;
     --gold: #CDAE78; --gold-ink: #D9BE8C; --gold-soft: #211F1A;
     --night: #060B14; --night-2: #0F1828; --on-night: #EEE7D7; --on-night-muted: #A3A8B2; --night-line: #26324A; --night-gold: #D6BA87;
-    --glow: rgba(214, 186, 135, .12); --warn: #E3A273; --warn-soft: #2A1D15; --track: #26324A;
+    --glow: rgba(214, 186, 135, .12); --warn: #E3A273; --warn-soft: #2A1D15;
+    --alert: #F97066; --alert-ink: #FDA29B; --alert-soft: #2B1414; --ok: #6CC596; --track: #26324A;
     color-scheme: dark;
   }
 }
@@ -41,11 +50,15 @@
   --paper: #0A101B; --surface: #111927; --ink: #ECE6D9; --muted: #9EA3AD; --line: #252F41;
   --gold: #CDAE78; --gold-ink: #D9BE8C; --gold-soft: #211F1A;
   --night: #060B14; --night-2: #0F1828; --on-night: #EEE7D7; --on-night-muted: #A3A8B2; --night-line: #26324A; --night-gold: #D6BA87;
-  --glow: rgba(214, 186, 135, .12); --warn: #E3A273; --warn-soft: #2A1D15; --track: #26324A;
+  --glow: rgba(214, 186, 135, .12); --warn: #E3A273; --warn-soft: #2A1D15;
+  --alert: #F97066; --alert-ink: #FDA29B; --alert-soft: #2B1414; --ok: #6CC596; --track: #26324A;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
 body {
+  margin: 0;
   background: var(--paper); color: var(--ink);
   font-family: var(--f-body); font-size: 15px; line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -59,9 +72,7 @@ body {
 
 /* ---------- Abertura ---------- */
 .hero {
-  background:
-    radial-gradient(ellipse 70% 120% at 88% -20%, var(--glow), transparent 60%),
-    var(--night);
+  background: radial-gradient(ellipse 70% 120% at 88% -20%, var(--glow), transparent 60%), var(--night);
   color: var(--on-night);
   border-bottom: 1px solid var(--night-gold);
   box-shadow: 0 4px 0 -3px var(--night-gold);
@@ -69,27 +80,31 @@ body {
 .hero .in { padding-block: 56px 0; display: grid; gap: 18px; }
 .hero .eyebrow { color: var(--night-gold); display: flex; align-items: center; gap: 14px; }
 .hero .eyebrow::before { content: ""; width: 36px; height: 1px; background: var(--night-gold); }
-h1 {
-  font-family: var(--f-display); font-weight: 500; margin: 0;
-  font-size: clamp(46px, 7.4vw, 92px); line-height: .95; letter-spacing: -.015em; text-wrap: balance;
-}
+h1 { font-family: var(--f-display); font-weight: 500; margin: 0; font-size: clamp(46px, 7.4vw, 92px); line-height: .95; letter-spacing: -.015em; text-wrap: balance; }
 h1 em { font-style: italic; color: var(--night-gold); font-weight: 500; }
-.lede { margin: 0; color: var(--on-night-muted); max-width: 62ch; font-size: 16px; }
+.lede { margin: 0; color: var(--on-night-muted); max-width: 64ch; font-size: 16px; }
 
-.phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 26px; border-top: 1px solid var(--night-line); }
-.phase { padding: 18px 22px 22px 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; align-items: baseline; min-width: 0; position: relative; }
-.phase + .phase { padding-left: 22px; border-left: 1px solid var(--night-line); }
-.phase .n { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--on-night-muted); grid-row: span 2; font-weight: 500; }
-.phase .t { font-family: var(--f-display); font-size: 21px; font-weight: 600; line-height: 1.15; }
+.phases { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 26px; border-top: 1px solid var(--night-line); }
+.phase { padding: 18px 20px 22px 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; align-items: baseline; min-width: 0; position: relative; color: inherit; text-decoration: none; }
+.phase + .phase { padding-left: 20px; border-left: 1px solid var(--night-line); }
+.phase .n { font-family: var(--f-display); font-size: 32px; line-height: 1; color: var(--night-gold); grid-row: span 2; font-weight: 500; font-style: italic; }
+.phase .t { font-family: var(--f-display); font-size: 20px; font-weight: 600; line-height: 1.15; }
 .phase .s { font-size: 12.5px; color: var(--on-night-muted); grid-column: 2; }
-.phase.on::before { content: ""; position: absolute; top: -1px; left: 0; right: 22px; height: 2px; background: var(--night-gold); }
-.phase + .phase.on::before { left: 22px; }
-.phase.on .n { color: var(--night-gold); font-style: italic; }
-.phase.off { opacity: .62; }
+a.phase::before { content: ""; position: absolute; top: -1px; left: 0; right: 20px; height: 2px; background: var(--night-gold); transform: scaleX(.25); transform-origin: left; transition: transform .25s; }
+.phase + a.phase::before { left: 20px; }
+a.phase:hover::before, a.phase:focus-visible::before { transform: scaleX(1); }
+.phase.off { opacity: .55; }
+.phase.off .n { color: var(--on-night-muted); }
 .phase.off .t { font-weight: 500; }
 
-/* ---------- Corpo ---------- */
-main.in { padding-block: 52px 24px; }
+/* ---------- Seções de fase ---------- */
+.fase { padding-block: 56px 8px; scroll-margin-top: 12px; }
+.fase + .fase { border-top: 1px solid var(--line); }
+.fase-h { display: flex; align-items: baseline; gap: 18px; margin-bottom: 30px; flex-wrap: wrap; }
+.fase-h .num { font-family: var(--f-display); font-style: italic; font-size: 64px; line-height: .8; color: var(--gold); }
+.fase-h h2 { font-size: clamp(32px, 4vw, 44px); }
+.fase-h p { margin: 6px 0 0; color: var(--muted); max-width: 70ch; flex-basis: 100%; }
+
 .grid { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 48px; align-items: start; }
 .col { display: grid; gap: 44px; min-width: 0; }
 
@@ -98,7 +113,7 @@ section.block { display: grid; gap: 18px; }
 .block-h::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 56px; height: 1px; background: var(--gold); }
 .block-h .ttl { display: grid; gap: 2px; }
 h2 { font-family: var(--f-display); font-weight: 600; font-size: 30px; line-height: 1.05; margin: 0; letter-spacing: -.005em; }
-h2 em { font-style: italic; font-weight: 500; color: var(--muted); font-size: .72em; margin-left: 8px; }
+h3.sub { font-family: var(--f-display); font-weight: 600; font-size: 26px; line-height: 1.1; margin: 0; }
 .hint { font-size: 13.5px; color: var(--muted); margin: 0; max-width: 70ch; }
 
 label.fld { display: grid; gap: 8px; }
@@ -115,7 +130,7 @@ select {
   background-size: 5px 5px, 5px 5px; background-repeat: no-repeat;
 }
 select:hover, input:hover { border-color: var(--gold); }
-select:focus-visible, input:focus-visible, button:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; border-color: var(--gold); }
+select:focus-visible, input:focus-visible, button:focus-visible, a:focus-visible, summary:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
 .row2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; }
 .limits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .limit { display: grid; gap: 8px; min-width: 0; }
@@ -127,33 +142,36 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 1px s
 .cite b { font-family: var(--f-display); font-size: 17px; font-weight: 600; color: var(--gold-ink); font-style: italic; }
 .err { color: var(--warn); background: var(--warn-soft); border-left: 2px solid var(--warn); padding: 10px 14px; font-size: 13.5px; }
 
-/* Circunstâncias */
+/* Cartões de circunstâncias (1ª fase) */
 .circs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .circ { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); padding: 16px 18px; display: grid; gap: 8px; min-width: 0; transition: background .2s; position: relative; }
 .circ.on { background: var(--gold-soft); }
 .circ.on::before { content: ""; position: absolute; left: -1px; top: -1px; bottom: -1px; width: 2px; background: var(--gold); }
 .circ label.head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; cursor: pointer; }
-.circ input[type="checkbox"] {
-  appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin: 4px 0 0; border: 1px solid var(--gold); border-radius: 2px; background: var(--surface); cursor: pointer; display: grid; place-items: center; transition: background .15s;
+input.box {
+  appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin: 4px 0 0; border: 1px solid var(--gold); border-radius: 2px; background: var(--surface); cursor: pointer; display: grid; place-items: center; transition: background .15s; flex: none;
 }
-.circ input[type="checkbox"]::after { content: ""; width: 5px; height: 10px; border: solid var(--surface); border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px); opacity: 0; }
-.circ input[type="checkbox"]:checked { background: var(--gold); }
-.circ input[type="checkbox"]:checked::after { opacity: 1; }
+input.box::after { content: ""; width: 5px; height: 10px; border: solid var(--surface); border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px); opacity: 0; }
+input.box:checked { background: var(--gold); }
+input.box:checked::after { opacity: 1; }
+input.box:disabled { opacity: .35; cursor: not-allowed; }
 .circ .ct { font-family: var(--f-display); font-weight: 600; font-size: 20px; line-height: 1.15; display: flex; gap: 10px; align-items: baseline; }
 .circ .ord { font-style: italic; font-weight: 500; color: var(--gold-ink); font-size: 18px; min-width: 22px; }
 .circ .cd { font-size: 13px; color: var(--muted); line-height: 1.5; display: block; margin-top: 4px; }
 .circ .tag { display: none; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-ink); font-weight: 600; }
 .circ.on .tag { display: block; }
 .circ .note { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; line-height: 1.5; }
-.circ .warn { font-size: 12.5px; color: var(--warn); background: var(--warn-soft); border-left: 2px solid var(--warn); padding: 7px 10px; line-height: 1.5; }
+.circ .warn { font-size: 12.5px; color: var(--alert-ink); background: var(--alert-soft); border-left: 3px solid var(--alert); padding: 7px 10px; line-height: 1.5; font-weight: 500; }
 .circ input[type="text"] { font-size: 13.5px; padding: 8px 10px; }
 .count { font-size: 13px; color: var(--muted); letter-spacing: .02em; }
 .count b { font-family: var(--f-display); font-size: 22px; font-weight: 600; color: var(--gold-ink); margin-right: 3px; }
 .btn { font: inherit; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 2px; padding: 9px 14px; cursor: pointer; transition: border-color .15s, color .15s, background .15s; }
 .btn:hover { border-color: var(--gold); color: var(--gold-ink); }
+.btn.solid { background: var(--gold); border-color: var(--gold); color: var(--surface); }
+.btn.solid:hover { background: transparent; color: var(--gold-ink); }
 .tools { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
 
-/* Critério */
+/* Opções (critério, reincidência, modo) */
 .crits { display: grid; gap: 0; border: 1px solid var(--line); }
 .crit { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: start; background: var(--surface); padding: 15px 18px; cursor: pointer; position: relative; transition: background .2s; }
 .crit + .crit { border-top: 1px solid var(--line); }
@@ -165,20 +183,59 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 1px s
 .crit .t { font-family: var(--f-display); font-weight: 600; font-size: 19px; line-height: 1.2; }
 .crit .t em { font-family: var(--f-body); font-style: normal; font-weight: 600; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-ink); margin-left: 10px; vertical-align: 3px; }
 .crit .d { font-size: 13px; color: var(--muted); display: block; margin-top: 3px; }
+.crit select { margin-top: 10px; max-width: 280px; padding: 8px 36px 8px 10px; font-size: 14px; }
 
 .notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 32px; padding-top: 4px; }
 .notes p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.55; }
 .notes b { display: block; font-family: var(--f-display); font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
 
+/* Listas de agravantes/atenuantes (2ª fase) */
+.items { display: grid; gap: 0; border: 1px solid var(--line); background: var(--surface); }
+.item { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 12px 16px; align-items: start; cursor: pointer; position: relative; transition: background .2s; }
+.item + .item { border-top: 1px solid var(--line); }
+.item:has(input:checked) { background: var(--gold-soft); }
+.item:has(input:checked)::before { content: ""; position: absolute; left: -1px; top: 0; bottom: 0; width: 2px; background: var(--gold); }
+.item:has(input:disabled) { cursor: not-allowed; }
+.item .art { font-size: 11.5px; letter-spacing: .06em; color: var(--gold-ink); font-weight: 600; margin-right: 8px; white-space: nowrap; }
+.item .it { font-size: 14px; line-height: 1.45; }
+.item .meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.item .in-note { font-size: 12.5px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
+.chip { font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; padding: 2px 7px; border: 1px solid var(--gold); color: var(--gold-ink); border-radius: 2px; }
+.chip.al { border-color: var(--alert); color: var(--alert-ink); background: var(--alert-soft); }
+.cols2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.cols2 > div { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.toggle { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; cursor: pointer; padding: 14px 16px; border: 1px solid var(--line); background: var(--surface); }
+.toggle:has(input:checked) { border-color: var(--alert); background: var(--alert-soft); }
+.toggle .t { font-weight: 600; font-size: 14px; }
+.toggle .d { font-size: 12.5px; color: var(--muted); display: block; }
+
+/* ---------- Alertas ---------- */
+.alert {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px;
+  border: 2px solid var(--alert); background: var(--alert-soft); color: var(--ink);
+  padding: 16px 18px; position: relative;
+}
+.alert .ico { width: 30px; height: 30px; color: var(--alert); flex: none; }
+.alert h4 { margin: 0 0 4px; font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--alert-ink); font-weight: 700; }
+.alert p, .alert li { margin: 0; font-size: 13.5px; line-height: 1.55; }
+.alert ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 8px; }
+.alert b { font-weight: 700; }
+.alert .src { display: block; font-size: 12px; color: var(--muted); margin-top: 4px; }
+.alert.big { border-width: 3px; padding: 22px 24px; box-shadow: 6px 6px 0 var(--alert-soft); }
+.alert.big .ico { width: 40px; height: 40px; }
+.alert.big h4 { font-size: 13px; }
+.alert.info { --alert: var(--gold); --alert-ink: var(--gold-ink); --alert-soft: var(--gold-soft); border-width: 1px; }
+.alerts { display: grid; gap: 10px; }
+
 /* ---------- Resultado ---------- */
 aside.res {
   position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px);
+  max-height: calc(100vh - 40px); overflow: auto;
   background: radial-gradient(ellipse 90% 60% at 100% 0%, var(--glow), transparent 70%), var(--night);
   color: var(--on-night); border: 1px solid var(--night-gold); min-width: 0;
   box-shadow: 0 24px 48px -28px rgba(6, 11, 20, .55);
+  outline: 1px solid var(--night-line); outline-offset: -7px;
 }
-aside.res::before { content: ""; position: absolute; inset: 6px; border: 1px solid var(--night-line); pointer-events: none; }
-.res > div { position: relative; }
 .res-h { padding: 30px 30px 24px; display: grid; gap: 10px; text-align: center; }
 .res-h .eyebrow { color: var(--night-gold); }
 .pb { font-family: var(--f-display); font-weight: 500; font-size: 46px; line-height: 1.02; letter-spacing: -.01em; text-wrap: balance; color: var(--on-night); font-variant-numeric: lining-nums; }
@@ -198,6 +255,8 @@ aside.res::before { content: ""; position: absolute; inset: 6px; border: 1px sol
 .mark { position: absolute; top: 11px; width: 12px; height: 12px; margin-left: -6px; transition: left .3s ease; }
 .mark::before { content: ""; position: absolute; inset: 0; background: var(--night-gold); transform: rotate(45deg); box-shadow: 0 0 0 4px var(--night); }
 .mark::after { content: attr(data-l); position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; font-weight: 600; color: var(--on-night); letter-spacing: .04em; }
+.mark.ghost::before { background: transparent; border: 1px solid var(--on-night-muted); }
+.mark.ghost::after { top: 20px; bottom: auto; color: var(--on-night-muted); font-weight: 500; }
 .lab { position: absolute; top: 28px; font-size: 10.5px; color: var(--on-night-muted); white-space: nowrap; transform: translateX(-50%); letter-spacing: .06em; font-variant-numeric: tabular-nums; }
 .lab.l { transform: none; }
 .lab.r { transform: translateX(-100%); }
@@ -205,63 +264,308 @@ aside.res::before { content: ""; position: absolute; inset: 6px; border: 1px sol
 .legend i { display: inline-block; width: 14px; height: 2px; margin-right: 7px; vertical-align: middle; background: var(--night-gold); }
 .legend i.z { height: 7px; background: transparent; border: 1px solid var(--night-gold); border-top: 0; opacity: .7; }
 
-.memo, .minuta { padding: 22px 30px; border-top: 1px solid var(--night-line); }
+.rsec { padding: 22px 30px; border-top: 1px solid var(--night-line); }
 .res h3 { font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--night-gold); font-weight: 600; margin: 0 0 14px; }
-.memo ol { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 12px; }
+.memo { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 12px; }
 .memo li { counter-increment: s; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; font-size: 13.5px; }
 .memo li::before { content: counter(s, upper-roman) "."; font-family: var(--f-display); font-style: italic; font-size: 16px; color: var(--night-gold); line-height: 1.25; }
 .memo .k { color: var(--on-night-muted); display: block; font-size: 12px; letter-spacing: .02em; }
 .memo .v { font-variant-numeric: tabular-nums lining-nums; overflow-wrap: anywhere; color: var(--on-night); }
 .memo .v b { font-weight: 600; color: var(--night-gold); }
-.memo .fx { font-size: 12px; color: var(--night-gold); margin-top: 14px; font-style: italic; }
+.fx { font-size: 12px; color: var(--night-gold); margin-top: 14px; font-style: italic; }
+.adj { display: grid; gap: 8px; }
+.adj div { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; font-size: 13px; }
+.adj .sg { font-family: var(--f-display); font-size: 18px; font-weight: 600; text-align: right; }
+.adj .sg.p { color: var(--night-gold); }
+.adj .sg.m { color: var(--on-night); }
+.adj .sg.z { color: var(--on-night-muted); font-size: 14px; }
+.adj .vv { color: var(--on-night-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.adj .empty { display: block; color: var(--on-night-muted); font-size: 13px; }
+.res .alerts { padding: 0 30px 22px; }
+.res .alert { color: var(--ink); }
 
 .minuta { display: grid; gap: 14px; padding-bottom: 28px; }
-.minuta-t { font-family: var(--f-display); font-size: 17.5px; line-height: 1.55; color: var(--on-night); background: var(--night-2); border-left: 2px solid var(--night-gold); padding: 16px 18px; text-align: left; hyphens: auto; }
+.minuta-t { font-family: var(--f-display); font-size: 17.5px; line-height: 1.55; color: var(--on-night); background: var(--night-2); border-left: 2px solid var(--night-gold); padding: 16px 18px; }
 .minuta-f { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .btn.gold { background: var(--night-gold); border-color: var(--night-gold); color: var(--night); }
 .btn.gold:hover { background: transparent; color: var(--night-gold); }
 .ok { font-size: 12px; color: var(--night-gold); font-style: italic; }
 
-footer.in { padding-block: 28px 56px; }
+/* Precedentes */
+details.prec { border: 1px solid var(--line); background: var(--surface); }
+details.prec > summary { cursor: pointer; padding: 16px 18px; font-family: var(--f-display); font-size: 21px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+details.prec > summary::-webkit-details-marker { display: none; }
+details.prec > summary::after { content: "+"; color: var(--gold-ink); font-size: 24px; line-height: 1; }
+details.prec[open] > summary::after { content: "−"; }
+.prec-list { display: grid; gap: 0; border-top: 1px solid var(--line); }
+.pc { padding: 16px 18px; display: grid; gap: 6px; }
+.pc + .pc { border-top: 1px solid var(--line); }
+.pc .h { display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.pc .h b { font-family: var(--f-display); font-size: 18px; font-weight: 600; }
+.pc .h span { font-size: 12px; color: var(--muted); letter-spacing: .03em; }
+.pc p { margin: 0; font-size: 13.5px; color: var(--ink); line-height: 1.55; }
+.pc .r { font-size: 12.5px; color: var(--gold-ink); font-weight: 600; letter-spacing: .02em; }
+
+/* ---------- Exercícios ---------- */
+.exs { display: grid; gap: 28px; }
+.ex { border: 1px solid var(--line); background: var(--surface); display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+.ex-q { padding: 26px 28px; display: grid; gap: 14px; align-content: start; border-right: 1px solid var(--line); min-width: 0; }
+.ex-q .eyebrow { display: flex; gap: 12px; align-items: center; }
+.ex-q p { margin: 0; font-size: 14.5px; line-height: 1.65; }
+.ex-q .instr { font-size: 13px; color: var(--muted); border-left: 2px solid var(--gold); padding-left: 12px; }
+.ex-q .hintbox { font-size: 13px; color: var(--gold-ink); background: var(--gold-soft); padding: 10px 12px; }
+.ex-a { padding: 26px 28px; display: grid; gap: 16px; align-content: start; min-width: 0; }
+.ans { display: grid; gap: 8px; }
+.ex-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.score { display: grid; gap: 14px; border-top: 1px solid var(--line); padding-top: 16px; }
+.srow { display: grid; gap: 6px; }
+.srow .top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.srow .top b { font-family: var(--f-display); font-size: 18px; font-weight: 600; }
+.srow .pct { font-family: var(--f-display); font-size: 28px; font-weight: 600; line-height: 1; }
+.srow .pct.hi { color: var(--ok); }
+.srow .pct.md { color: var(--gold-ink); }
+.srow .pct.lo { color: var(--alert); }
+.srow .cmp { font-size: 13px; color: var(--muted); }
+.srow .cmp strong { color: var(--ink); font-weight: 600; }
+.pbar { height: 6px; background: var(--line); position: relative; }
+.pbar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--gold); transition: width .4s ease; }
+.overall { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; background: var(--gold-soft); padding: 12px 14px; flex-wrap: wrap; }
+.overall span { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; font-weight: 600; color: var(--gold-ink); }
+.overall b { font-family: var(--f-display); font-size: 30px; font-weight: 600; }
+details.sol > summary { cursor: pointer; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; color: var(--gold-ink); }
+details.sol ol { margin: 12px 0 0; padding-left: 20px; display: grid; gap: 8px; font-size: 13.5px; }
+.formula { font-size: 12.5px; color: var(--muted); margin: 0; }
+
+footer.in { padding-block: 40px 56px; }
 footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; max-width: 92ch; }
 
-@media (max-width: 980px) {
+@media (max-width: 1020px) {
   .grid { grid-template-columns: minmax(0, 1fr); }
-  aside.res { position: relative; top: 0; }
+  aside.res { position: relative; top: 0; max-height: none; }
+  .ex { grid-template-columns: minmax(0, 1fr); }
+  .ex-q { border-right: 0; border-bottom: 1px solid var(--line); }
+}
+@media (max-width: 760px) {
+  .phases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .phase:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .phase:nth-child(n+3) { border-top: 1px solid var(--night-line); }
+  .phase:nth-child(odd)::before { left: 0; }
+  .cols2 { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 680px) {
   .hero .in { padding-block: 40px 0; }
   .circs, .limits, .row2, .notes { grid-template-columns: minmax(0, 1fr); }
-  .phases { grid-template-columns: minmax(0, 1fr); }
-  .phase, .phase + .phase { padding: 14px 0; border-left: 0; }
-  .phase + .phase { border-top: 1px solid var(--night-line); }
-  .phase.on::before, .phase + .phase.on::before { left: 0; right: 0; }
-  .res-h, .ruler, .memo, .minuta { padding-left: 22px; padding-right: 22px; }
+  .res-h, .ruler, .rsec { padding-left: 22px; padding-right: 22px; }
+  .res .alerts { padding: 0 22px 22px; }
   .pb { font-size: 38px; }
   h2 { font-size: 26px; }
+  .fase-h .num { font-size: 48px; }
+  .ex-q, .ex-a { padding: 20px; }
+  .alert.big { padding: 18px; }
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } html { scroll-behavior: auto; } }
+
+/* =================== MÓDULO REINCIDÊNCIA & MAUS ANTECEDENTES ===================
+   Seção de identidade única (carvão, grafite e dourado fosco), igual nos dois temas. */
+.rm {
+  --rm-bg: #15171C; --rm-panel: #202329; --rm-elev: #292D34; --rm-gold: #B79B5B; --rm-ivory: #E7DFCF; --rm-beige: #B1AA9D;
+  --rm-green: #14584D; --rm-green-hi: #4FA593; --rm-wine: #8E4853; --rm-wine-hi: #C98A95; --rm-bronze: #9C7757;
+  --rm-line: rgba(231, 223, 207, .12); --rm-line2: rgba(231, 223, 207, .24);
+  background: var(--rm-bg); color: var(--rm-ivory); color-scheme: dark;
+  border-top: 1px solid var(--rm-gold); scroll-margin-top: 0;
+}
+.rm > .in { padding-block: 72px 80px; display: grid; gap: 40px; }
+.rm .eyebrow { color: var(--rm-gold); }
+.rm-head { display: grid; gap: 10px; max-width: 900px; }
+.rm-head h2 { font-family: var(--f-display); font-weight: 500; font-size: clamp(34px, 5.4vw, 64px); line-height: 1; letter-spacing: .03em; text-transform: uppercase; margin: 0; }
+.rm-head h2 em { font-style: italic; text-transform: none; color: var(--rm-gold); letter-spacing: 0; }
+.rm-head p { margin: 0; font-family: var(--f-display); font-style: italic; font-size: 22px; color: var(--rm-beige); }
+.rm-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--rm-gold); }
+.rm-card { padding: 22px 28px 6px 0; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.rm-card + .rm-card { padding-left: 28px; border-left: 1px solid var(--rm-line); }
+.rm-card .k { font-size: 10.5px; letter-spacing: .24em; text-transform: uppercase; color: var(--rm-gold); font-weight: 600; }
+.rm-card h3 { font-family: var(--f-display); font-weight: 600; font-size: 28px; margin: 0; line-height: 1.1; }
+.rm-card p { margin: 0; color: var(--rm-beige); font-size: 14.5px; line-height: 1.6; max-width: 56ch; }
+
+.rm-ctrl { display: flex; flex-wrap: wrap; gap: 18px 28px; align-items: end; justify-content: space-between; padding-bottom: 20px; border-bottom: 1px solid var(--rm-line); }
+.rm-ctrl .grp { display: grid; gap: 8px; min-width: 0; }
+.rm .lbl { color: var(--rm-beige); }
+.seg { display: inline-flex; border: 1px solid var(--rm-line2); }
+.seg button { font: inherit; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; font-weight: 600; padding: 10px 16px; background: transparent; color: var(--rm-beige); border: 0; cursor: pointer; transition: background .2s, color .2s; }
+.seg button + button { border-left: 1px solid var(--rm-line2); }
+.seg button[aria-pressed="true"] { background: var(--rm-gold); color: var(--rm-bg); }
+.rm-ex { display: flex; flex-wrap: wrap; gap: 6px 4px; }
+.rm-ex button, .rm .lnk { font: inherit; font-size: 12.5px; background: transparent; border: 0; border-bottom: 1px solid transparent; color: var(--rm-beige); padding: 4px 8px; cursor: pointer; transition: color .15s, border-color .15s; }
+.rm-ex button:hover, .rm .lnk:hover { color: var(--rm-ivory); border-bottom-color: var(--rm-gold); }
+.rm-ex button[aria-pressed="true"] { color: var(--rm-gold); border-bottom-color: var(--rm-gold); }
+.rm-ex button b { font-weight: 600; color: var(--rm-gold); margin-right: 4px; font-variant-numeric: tabular-nums; }
+.rm-act { display: flex; gap: 8px; flex-wrap: wrap; }
+.rm .btn { color: var(--rm-ivory); border-color: var(--rm-line2); }
+.rm .btn:hover { color: var(--rm-gold); border-color: var(--rm-gold); }
+
+.rm-nat { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: end; }
+.nat-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.nat-opts label { display: inline-flex; align-items: center; gap: 10px; padding: 9px 14px 9px 12px; border: 1px solid var(--rm-line2); cursor: pointer; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--rm-beige); transition: border-color .2s, color .2s, background .2s; }
+.nat-opts input { position: absolute; opacity: 0; pointer-events: none; }
+.nat-opts .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px var(--rm-bg), 0 0 0 4px var(--c); flex: none; }
+.nat-opts label:has(input:checked) { border-color: var(--c); color: var(--rm-ivory); background: var(--rm-panel); }
+.nat-opts label:has(input:focus-visible) { outline: 1px solid var(--rm-gold); outline-offset: 2px; }
+.rm select, .rm input[type="text"] { background-color: var(--rm-elev); color: var(--rm-ivory); border: 1px solid var(--rm-line2); }
+.rm select:hover, .rm input[type="text"]:hover { border-color: var(--rm-gold); }
+.rm input[type="text"] { font-variant-numeric: tabular-nums lining-nums; letter-spacing: .04em; }
+.rm input[aria-invalid="true"] { border-color: var(--rm-wine-hi); }
+
+.rm-main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 32px; align-items: start; }
+.rm-tl { background: var(--rm-panel); border: 1px solid var(--rm-line); min-width: 0; }
+.rm-tl-h { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--rm-line); flex-wrap: wrap; }
+.rm-tl-h .hint { color: var(--rm-beige); font-size: 12.5px; }
+.zoom { display: inline-flex; align-items: center; gap: 6px; }
+.zoom button { width: 30px; height: 30px; font: inherit; font-size: 16px; background: transparent; color: var(--rm-ivory); border: 1px solid var(--rm-line2); cursor: pointer; }
+.zoom button:hover { border-color: var(--rm-gold); color: var(--rm-gold); }
+.zoom span { font-size: 12px; color: var(--rm-beige); min-width: 42px; text-align: center; font-variant-numeric: tabular-nums; }
+.rm-scroll { overflow-x: auto; overflow-y: hidden; }
+.rm-svg { display: block; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.rm-svg.drag { cursor: grabbing; }
+.rm-svg text { font-family: var(--f-body); }
+#rmNovo { cursor: grab; outline: none; }
+#rmNovo:focus-visible .halo { stroke: var(--rm-gold); stroke-width: 2; }
+.rm-dates { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--rm-line); }
+.rm-date { padding: 14px 16px 16px; display: grid; gap: 8px; min-width: 0; }
+.rm-date + .rm-date { border-left: 1px solid var(--rm-line); }
+.rm-date .lbl { display: flex; align-items: center; gap: 8px; font-size: 10px; }
+.rm-date .sh { width: 10px; height: 10px; flex: none; }
+.rm-date input { padding: 9px 10px; font-size: 14px; }
+.rm-date.nv { background: rgba(142, 72, 83, .14); }
+.rm-opts { display: flex; flex-wrap: wrap; gap: 14px 28px; padding: 14px 18px; border-top: 1px solid var(--rm-line); align-items: center; }
+.rm-chk { display: inline-flex; gap: 10px; align-items: center; font-size: 13px; color: var(--rm-beige); cursor: pointer; }
+.rm-chk input { accent-color: var(--rm-gold); width: 16px; height: 16px; }
+details.rm-adv { border-top: 1px solid var(--rm-line); }
+details.rm-adv > summary { cursor: pointer; padding: 14px 18px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; color: var(--rm-gold); list-style: none; }
+details.rm-adv > summary::-webkit-details-marker { display: none; }
+details.rm-adv > summary::before { content: "+ "; }
+details.rm-adv[open] > summary::before { content: "− "; }
+.rm-adv-b { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 0 18px 18px; align-items: end; }
+.rm-adv-b p { grid-column: 1 / -1; margin: 0; font-size: 12.5px; color: var(--rm-beige); }
+
+.rm-res { background: var(--rm-panel); border: 1px solid var(--rm-gold); position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); max-height: calc(100vh - 40px); overflow: auto; min-width: 0; }
+.rm-res-h { padding: 22px 24px 18px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; border-bottom: 1px solid var(--rm-line); flex-wrap: wrap; }
+.rm-res-h h3 { margin: 0; font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--rm-gold); font-weight: 600; }
+.sim-tag { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; color: var(--rm-bg); background: var(--rm-gold); padding: 3px 8px; }
+.rm-big { display: grid; gap: 0; }
+.rm-big > div { padding: 16px 24px; display: grid; gap: 8px; border-bottom: 1px solid var(--rm-line); }
+.rm-big span { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--rm-beige); font-weight: 600; }
+.pill { justify-self: start; font-family: var(--f-display); font-size: 23px; font-weight: 600; letter-spacing: .06em; padding: 4px 14px 2px; line-height: 1.2; transition: background .25s, color .25s; }
+.p-sim { background: var(--rm-wine); color: var(--rm-ivory); }
+.p-nao { background: var(--rm-green); color: var(--rm-ivory); }
+.p-ind { background: transparent; color: var(--rm-gold); box-shadow: inset 0 0 0 1px var(--rm-gold); }
+.p-pos { background: var(--rm-bronze); color: var(--rm-ivory); }
+.rm-dl { margin: 0; padding: 14px 24px; display: grid; gap: 10px; border-bottom: 1px solid var(--rm-line); }
+.rm-dl div { display: grid; gap: 2px; }
+.rm-dl dt { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--rm-beige); }
+.rm-dl dd { margin: 0; font-size: 13.5px; line-height: 1.45; font-variant-numeric: tabular-nums; }
+.rm-fund { padding: 16px 24px 22px; display: grid; gap: 10px; }
+.rm-fund h4 { margin: 0; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--rm-gold); font-weight: 600; }
+.rm-fund p { margin: 0; font-size: 13.5px; line-height: 1.62; color: var(--rm-ivory); }
+.rm-fund p.warn { color: var(--rm-ivory); border-left: 2px solid var(--rm-wine-hi); padding-left: 10px; }
+.rm-fund p.note { color: var(--rm-beige); font-size: 12.5px; }
+.rm-fund ul { margin: 0; padding-left: 18px; font-size: 13px; color: var(--rm-ivory); }
+
+details.rm-why, .rm-quiz { border: 1px solid var(--rm-line); background: var(--rm-panel); }
+details.rm-why > summary { cursor: pointer; padding: 20px 24px; font-family: var(--f-display); font-size: 26px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; text-transform: uppercase; letter-spacing: .03em; }
+details.rm-why > summary::-webkit-details-marker { display: none; }
+details.rm-why > summary::after { content: "+"; color: var(--rm-gold); font-size: 28px; }
+details.rm-why[open] > summary::after { content: "−"; }
+.why-b { padding: 0 24px 24px; display: grid; gap: 24px; }
+.why-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.why-cols h4 { margin: 0 0 10px; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--rm-gold); }
+.req { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.req li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; font-size: 13.5px; line-height: 1.5; }
+.req .i { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; margin-top: 1px; }
+.req .ok { background: var(--rm-green); color: var(--rm-ivory); }
+.req .no { background: var(--rm-wine); color: var(--rm-ivory); }
+.req .na { box-shadow: inset 0 0 0 1px var(--rm-line2); color: var(--rm-beige); }
+.dout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--rm-line); }
+.dout div { padding: 16px 18px 0 0; display: grid; gap: 4px; align-content: start; }
+.dout div:nth-child(even) { padding-left: 18px; border-left: 1px solid var(--rm-line); }
+.dout b { font-family: var(--f-display); font-size: 18px; font-weight: 600; }
+.dout p { margin: 0; font-size: 13px; color: var(--rm-beige); line-height: 1.55; }
+.dout cite { font-style: normal; font-size: 11.5px; color: var(--rm-gold); letter-spacing: .04em; }
+
+.rm-quiz { padding: 24px; display: grid; gap: 18px; }
+.rm-quiz > h3 { font-family: var(--f-display); font-size: 26px; font-weight: 600; margin: 0; text-transform: uppercase; letter-spacing: .03em; }
+.qz-nav { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.qz-nav button { width: 34px; height: 34px; font: inherit; font-size: 13px; font-weight: 600; background: transparent; color: var(--rm-beige); border: 1px solid var(--rm-line2); cursor: pointer; font-variant-numeric: tabular-nums; }
+.qz-nav button[aria-current="true"] { border-color: var(--rm-gold); color: var(--rm-gold); }
+.qz-nav button.right { background: var(--rm-green); color: var(--rm-ivory); border-color: var(--rm-green); }
+.qz-nav button.wrong { background: var(--rm-wine); color: var(--rm-ivory); border-color: var(--rm-wine); }
+.qz-nav .qz-score { margin-left: 10px; font-size: 12.5px; color: var(--rm-beige); }
+.qz-q { margin: 0; font-size: 15px; line-height: 1.65; max-width: 80ch; }
+.qz-tl { border: 1px solid var(--rm-line); background: var(--rm-bg); overflow-x: auto; }
+.qz-ans { display: flex; gap: 8px; flex-wrap: wrap; }
+.qz-ans button { font: inherit; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; padding: 12px 18px; border: 1px solid var(--rm-line2); background: transparent; color: var(--rm-ivory); cursor: pointer; transition: border-color .15s, background .15s; }
+.qz-ans button:hover:not(:disabled) { border-color: var(--rm-gold); }
+.qz-ans button.right { background: var(--rm-green); border-color: var(--rm-green); }
+.qz-ans button.wrong { background: var(--rm-wine); border-color: var(--rm-wine); }
+.qz-ans button:disabled { cursor: default; }
+.qz-fb { border-left: 2px solid var(--rm-gold); padding: 4px 0 4px 14px; display: grid; gap: 6px; }
+.qz-fb b { font-family: var(--f-display); font-size: 20px; font-weight: 600; }
+.qz-fb p { margin: 0; font-size: 13.5px; color: var(--rm-ivory); line-height: 1.6; }
+.qz-foot { display: flex; gap: 8px; flex-wrap: wrap; }
+
+@media (max-width: 1060px) {
+  .rm-main { grid-template-columns: minmax(0, 1fr); }
+  .rm-res { position: relative; top: 0; max-height: none; }
+  .rm-dates { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .rm-date:nth-child(4) { border-left: 0; }
+  .rm-date:nth-child(n+4) { border-top: 1px solid var(--rm-line); }
+  .rm-nat { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .rm-nat > :first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 680px) {
+  .rm > .in { padding-block: 48px 56px; }
+  .rm-cards, .why-cols, .dout, .rm-nat, .rm-adv-b { grid-template-columns: minmax(0, 1fr); }
+  .rm-card + .rm-card { padding-left: 0; border-left: 0; border-top: 1px solid var(--rm-line); }
+  .dout div:nth-child(even) { padding-left: 0; border-left: 0; }
+  .rm-dates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rm-date:nth-child(n) { border-left: 0; border-top: 1px solid var(--rm-line); }
+  .rm-date:nth-child(even) { border-left: 1px solid var(--rm-line); }
+  .rm-date:first-child { border-top: 0; }
+  .rm-res-h, .rm-big > div, .rm-dl, .rm-fund { padding-left: 18px; padding-right: 18px; }
+  .rm-quiz { padding: 18px; }
+}
 </style>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="warn" viewBox="0 0 24 24"><path d="M12 2.5 1.5 21h21L12 2.5Z" fill="currentColor"/><path d="M12 9v5.2" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="17.4" r="1.3" fill="#fff"/></symbol>
+</svg>
 
 <header class="hero">
   <div class="in">
     <div class="eyebrow">Critério trifásico · Art. 68 do Código Penal</div>
     <h1>Dosimetria <em>da</em> Pena</h1>
-    <p class="lede">Primeira fase: a pena-base, fixada a partir dos limites em abstrato do tipo penal e das oito circunstâncias judiciais do art. 59, pelo critério do termo médio.</p>
+    <p class="lede">Pena-base e pena provisória calculadas segundo o Código Penal, o material de aula e os parâmetros aplicados pelo STJ e pelas Câmaras Criminais do TJRS, com exercícios para praticar.</p>
     <nav class="phases" aria-label="Fases da dosimetria">
-      <div class="phase on"><span class="n">I</span><span class="t">Pena-base</span><span class="s">Circunstâncias judiciais, art. 59</span></div>
-      <div class="phase off"><span class="n">II</span><span class="t">Pena provisória</span><span class="s">Agravantes e atenuantes · próxima etapa</span></div>
+      <a class="phase" href="#fase1"><span class="n">I</span><span class="t">Pena-base</span><span class="s">Circunstâncias judiciais, art. 59</span></a>
+      <a class="phase" href="#fase2"><span class="n">II</span><span class="t">Pena provisória</span><span class="s">Agravantes e atenuantes, arts. 61 a 67</span></a>
       <div class="phase off"><span class="n">III</span><span class="t">Pena definitiva</span><span class="s">Causas de aumento e diminuição · próxima etapa</span></div>
+      <a class="phase" href="#reincidencia"><span class="n">R</span><span class="t">Reincidência</span><span class="s">Linha do tempo × maus antecedentes</span></a>
+      <a class="phase" href="#exercicios"><span class="n">§</span><span class="t">Exercícios</span><span class="s">Três casos com correção</span></a>
     </nav>
   </div>
 </header>
 
-<main class="in">
+<main>
+<!-- ===================== 1ª FASE ===================== -->
+<div class="fase in" id="fase1">
+  <div class="fase-h"><span class="num">I</span><h2>Pena-base</h2><p>Parte do mínimo cominado e eleva a pena para cada circunstância judicial desfavorável do art. 59, sem ultrapassar o teto da primeira fase.</p></div>
   <div class="grid">
     <div class="col">
 
       <section class="block" aria-labelledby="h-tipo">
-        <div class="block-h"><div class="ttl"><span class="eyebrow">Limites em abstrato</span><h2 id="h-tipo">Tipo penal</h2></div></div>
+        <div class="block-h"><div class="ttl"><span class="eyebrow">Limites em abstrato</span><h3 class="sub" id="h-tipo">Tipo penal</h3></div></div>
         <div class="row2">
           <label class="fld"><span class="lbl">Crime</span>
             <select id="crime"></select>
@@ -297,7 +601,7 @@ footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px so
 
       <section class="block" aria-labelledby="h-circ">
         <div class="block-h">
-          <div class="ttl"><span class="eyebrow">Art. 59 do Código Penal</span><h2 id="h-circ">Circunstâncias judiciais</h2></div>
+          <div class="ttl"><span class="eyebrow">Art. 59 do Código Penal</span><h3 class="sub" id="h-circ">Circunstâncias judiciais</h3></div>
           <div class="tools"><span class="count" id="count"></span><button class="btn" id="clear" type="button">Desmarcar todas</button></div>
         </div>
         <p class="hint">Marque as circunstâncias valoradas negativamente; as demais são tidas como neutras ou favoráveis. O fundamento concreto é opcional e passa a integrar a minuta.</p>
@@ -305,27 +609,31 @@ footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px so
       </section>
 
       <section class="block" aria-labelledby="h-crit">
-        <div class="block-h"><div class="ttl"><span class="eyebrow">Fração por circunstância</span><h2 id="h-crit">Critério de exasperação</h2></div></div>
-        <div class="crits" id="crits">
+        <div class="block-h"><div class="ttl"><span class="eyebrow">Fração por circunstância</span><h3 class="sub" id="h-crit">Critério de exasperação</h3></div></div>
+        <div class="crits">
           <label class="crit"><input type="radio" name="crit" id="critA" value="A" checked>
             <span><span class="t">Termo médio <em>Padrão do material</em></span><span class="d">Cada circunstância vale 1/8 do intervalo entre a pena mínima e o termo médio. Com as oito desfavoráveis, a pena-base atinge o termo médio.</span></span></label>
           <label class="crit"><input type="radio" name="crit" id="critB" value="B">
-            <span><span class="t">Um oitavo do intervalo total</span><span class="d">Cada circunstância vale 1/8 da diferença entre a pena máxima e a mínima. Fração frequentemente admitida pelo STJ; com as oito desfavoráveis, alcança o máximo.</span></span></label>
+            <span><span class="t">Um oitavo do intervalo total <em>STJ</em></span><span class="d">Cada circunstância vale 1/8 da diferença entre a pena máxima e a mínima.</span></span></label>
           <label class="crit"><input type="radio" name="crit" id="critC" value="C">
-            <span><span class="t">Um sexto da pena mínima</span><span class="d">Cada circunstância eleva a pena em 1/6 do mínimo cominado, limitada ao máximo. Fração também admitida pelo STJ.</span></span></label>
+            <span><span class="t">Um sexto da pena mínima <em>STJ · TJRS</em></span><span class="d">Cada circunstância eleva a pena em 1/6 do mínimo cominado, limitada ao máximo.</span></span></label>
+        </div>
+        <div class="alert info">
+          <svg class="ico" aria-hidden="true"><use href="#warn"/></svg>
+          <div><h4>O que os tribunais aplicam</h4>
+            <p>Nos acórdãos analisados, o TJRS adotou <b>1/6 sobre a pena mínima</b> (Ap. 5029819-78.2013 e Ap. 5002276-52.2018) ou admitiu também <b>1/8 do intervalo entre mínimo e máximo</b>, frações consolidadas pelo STJ (AgRg no AREsp 2.857.832/RN). Fração superior exige fundamentação concreta (Ap. 5003204-18.2023). O termo médio é o critério do material de aula.</p></div>
         </div>
       </section>
 
       <div class="notes">
-        <p><b>Qualificadora primeiro</b>Antes da dosimetria, verifique se há qualificadora, pois ela altera os próprios limites da pena (homicídio simples, 6 a 20 anos; qualificado, 12 a 30 anos).</p>
+        <p><b>Qualificadora primeiro</b>Antes da dosimetria, verifique se há qualificadora, pois ela altera os próprios limites da pena. Havendo mais de uma, as remanescentes vão para a pena-base ou, se previstas como agravante, para a segunda fase.</p>
         <p><b>Limites da primeira fase</b>A pena-base parte do mínimo cominado e não pode ultrapassar os limites em abstrato. Fixada no mínimo, tolera-se fundamentação sucinta.</p>
         <p><b>Contagem</b>Adota-se 1 ano = 12 meses e 1 mês = 30 dias. Frações de dia são desprezadas (art. 11, CP).</p>
         <p><b>Lei no tempo</b>O catálogo segue a redação vigente; para fatos anteriores às Leis 15.280/2025 e 15.397/2026, use a opção “redação anterior”, pois a lei mais grave não retroage (art. 5º, XL, CF).</p>
       </div>
-
     </div>
 
-    <aside class="res" aria-live="polite">
+    <aside class="res" aria-live="polite" aria-label="Resultado da primeira fase">
       <div class="res-h">
         <span class="eyebrow">Pena-base fixada</span>
         <div class="pb" id="pb">—</div>
@@ -337,27 +645,257 @@ footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px so
         <div class="track" id="track"></div>
         <div class="legend"><span><i></i>Exasperação aplicada</span><span><i class="z"></i>Faixa da primeira fase</span></div>
       </div>
-      <div class="memo">
+      <div class="rsec">
         <h3>Memória de cálculo</h3>
-        <ol id="memo"></ol>
+        <ol class="memo" id="memo"></ol>
         <div class="fx" id="fx" hidden></div>
       </div>
-      <div class="minuta">
+      <div class="rsec minuta">
         <h3>Minuta de fundamentação</h3>
         <div class="minuta-t" id="minuta"></div>
-        <div class="minuta-f"><button class="btn gold" id="copy" type="button">Copiar texto</button><span class="ok" id="copied" hidden>Texto copiado</span></div>
+        <div class="minuta-f"><button class="btn gold" id="copy" type="button" data-src="minuta" data-ok="copied">Copiar texto</button><span class="ok" id="copied" hidden>Texto copiado</span></div>
       </div>
     </aside>
   </div>
+</div>
+
+<!-- ===================== 2ª FASE ===================== -->
+<div class="fase in" id="fase2">
+  <div class="fase-h"><span class="num">II</span><h2>Pena provisória</h2><p>Sobre a pena-base incidem as agravantes (arts. 61 e 62) e as atenuantes (arts. 65 e 66). No concurso entre elas, prevalecem as preponderantes (art. 67), e o resultado fica entre o mínimo e o máximo cominados.</p></div>
+
+  <div class="alert big" role="note" style="margin-bottom:36px">
+    <svg class="ico" aria-hidden="true"><use href="#warn"/></svg>
+    <div>
+      <h4>Atenção · Circunstâncias que se anulam ou se sobrepõem</h4>
+      <ul>
+        <li><b>Reincidência × confissão espontânea se anulam por inteiro</b>, pois são igualmente preponderantes (STJ, REsp 1.341.370/MT e Tema 585; TJRS, Ap. 5029819-78.2013, com confissão qualificada). <b>Exceção:</b> na <b>multirreincidência</b>, prepondera a reincidência e a compensação é apenas proporcional.<span class="src">Divergência: a 7ª Câmara Criminal do TJRS negou a compensação por entender que a confissão não integra a personalidade (Ap. 5082989-42.2025), posição contrária ao precedente qualificado do STJ.</span></li>
+        <li><b>Menoridade relativa e senilidade são sempre preponderantes</b> e prevalecem sobre agravantes objetivas, <b>mas não as anulam</b>: ambas incidem, com peso maior para a atenuante (TJRS, Ap. 5002276-52.2018: +1/6 pela agravante e −1/5 pela atenuante; Ap. 5032094-40.2022).</li>
+        <li><b>São preponderantes</b> (art. 67) as circunstâncias ligadas aos <b>motivos determinantes</b>, à <b>personalidade</b> (menoridade, senilidade, confissão) e à <b>reincidência</b>. Agravantes de modo de execução, como a emboscada, <b>não preponderam</b> (Ap. 5004331-20.2022).</li>
+        <li><b>O art. 67 só opera dentro da 2ª fase.</b> Uma atenuante <b>não compensa</b> circunstância judicial negativa da 1ª fase (TJRS, Ap. 5003204-18.2023).</li>
+        <li><b>Súmula 231 do STJ:</b> a atenuante não reduz a pena abaixo do mínimo legal; ela é reconhecida, mas não produz efeito (Ap. 5004331-20.2022). A agravante também não ultrapassa o máximo.</li>
+        <li><b>Bis in idem:</b> circunstância que qualifica o crime ou é elementar não agrava de novo. Qualificadora remanescente prevista no art. 61 pode ser usada como agravante (Ap. 5032094-40.2022). A mesma condenação não serve para reincidência e maus antecedentes (Súm. 241, STJ).</li>
+        <li><b>Lei 15.160/2025:</b> a menoridade e a senilidade (art. 65, I) <b>não se aplicam</b> se o crime envolver violência sexual contra a mulher (fatos a partir de 04/07/2025).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+
+      <section class="block" aria-labelledby="h-rein">
+        <div class="block-h"><div class="ttl"><span class="eyebrow">Art. 61, I · arts. 63 e 64</span><h3 class="sub" id="h-rein">Reincidência</h3></div></div>
+        <div class="crits">
+          <label class="crit"><input type="radio" name="rein" id="reinN" value="nao" checked>
+            <span><span class="t">Primário</span><span class="d">Sem condenação anterior definitiva apta a gerar reincidência, ou já superado o período depurador de 5 anos (art. 64, I).</span></span></label>
+          <label class="crit"><input type="radio" name="rein" id="reinS" value="simples">
+            <span><span class="t">Reincidente <em>Preponderante</em></span><span class="d">Uma condenação anterior transitada em julgado. Fração paradigma de 1/6.</span></span></label>
+          <label class="crit"><input type="radio" name="rein" id="reinM" value="multi">
+            <span><span class="t">Multirreincidente <em>Preponderante</em></span><span class="d">Duas ou mais condenações aptas a gerar reincidência. Admite fração superior a 1/6, com fundamentação (TJRS, Ap. 5032094-40.2022, fração de 1/5).</span>
+              <select id="multiFrac" aria-label="Fração da multirreincidência">
+                <option value="5">1/5 (adotada pela 3ª Câmara do TJRS)</option>
+                <option value="4">1/4</option>
+                <option value="3">1/3</option>
+                <option value="2">1/2</option>
+              </select></span></label>
+        </div>
+      </section>
+
+      <section class="block" aria-labelledby="h-ag">
+        <div class="block-h"><div class="ttl"><span class="eyebrow">Arts. 61, II, e 62 do Código Penal</span><h3 class="sub" id="h-ag">Agravantes</h3></div><span class="count" id="countAg"></span></div>
+        <p class="hint">As agravantes só incidem quando não constituem nem qualificam o crime (art. 61, caput).</p>
+        <div class="items" id="ags"></div>
+      </section>
+
+      <section class="block" aria-labelledby="h-at">
+        <div class="block-h"><div class="ttl"><span class="eyebrow">Arts. 65 e 66 do Código Penal</span><h3 class="sub" id="h-at">Atenuantes</h3></div><span class="count" id="countAt"></span></div>
+        <label class="toggle"><input class="box" type="checkbox" id="sexMulher">
+          <span><span class="t">O crime envolve violência sexual contra a mulher (fato a partir de 04/07/2025)</span><span class="d">Afasta a atenuante do art. 65, I (Lei 15.160/2025).</span></span></label>
+        <div class="items" id="ats"></div>
+      </section>
+
+      <section class="block" aria-labelledby="h-modo">
+        <div class="block-h"><div class="ttl"><span class="eyebrow">Como as frações incidem</span><h3 class="sub" id="h-modo">Forma de cálculo</h3></div></div>
+        <div class="crits">
+          <label class="crit"><input type="radio" name="modo" id="modoS" value="soma" checked>
+            <span><span class="t">Sobre a pena-base <em>Mais usual</em></span><span class="d">Cada fração é calculada sobre a pena-base e os resultados são somados ou subtraídos. Método das 2ª, 3ª e 7ª Câmaras Criminais do TJRS nos acórdãos analisados.</span></span></label>
+          <label class="crit"><input type="radio" name="modo" id="modoC" value="cascata">
+            <span><span class="t">Em cascata</span><span class="d">Aplicam-se primeiro as agravantes e, sobre o resultado, as atenuantes. Método da 8ª Câmara Criminal (Ap. 5002276-52.2018).</span></span></label>
+        </div>
+      </section>
+
+      <details class="prec">
+        <summary>Como os tribunais calcularam <span class="eyebrow">6 acórdãos</span></summary>
+        <div class="prec-list" id="prec"></div>
+      </details>
+    </div>
+
+    <aside class="res" aria-live="polite" aria-label="Resultado da segunda fase">
+      <div class="res-h">
+        <span class="eyebrow">Pena provisória</span>
+        <div class="pb" id="pp">—</div>
+        <div class="pb-esp" id="ppesp"></div>
+        <div class="orn" aria-hidden="true"><span></span></div>
+        <div class="pb-sub" id="ppsub"></div>
+      </div>
+      <div class="ruler">
+        <div class="track" id="track2"></div>
+        <div class="legend"><span><i></i>Pena provisória</span><span><i class="z"></i>Limites em abstrato</span></div>
+      </div>
+      <div class="alerts" id="alerts2"></div>
+      <div class="rsec">
+        <h3>Agravantes e atenuantes aplicadas</h3>
+        <div class="adj" id="adj"></div>
+      </div>
+      <div class="rsec">
+        <h3>Memória de cálculo</h3>
+        <ol class="memo" id="memo2"></ol>
+      </div>
+      <div class="rsec minuta">
+        <h3>Minuta de fundamentação</h3>
+        <div class="minuta-t" id="minuta2"></div>
+        <div class="minuta-f"><button class="btn gold" id="copy2" type="button" data-src="minuta2" data-ok="copied2">Copiar texto</button><span class="ok" id="copied2" hidden>Texto copiado</span></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ===================== REINCIDÊNCIA & MAUS ANTECEDENTES ===================== -->
+<section class="rm" id="reincidencia" aria-labelledby="rm-t">
+ <div class="in">
+  <header class="rm-head">
+    <span class="eyebrow">Módulo · Arts. 59, 61, I, 63 e 64 do Código Penal</span>
+    <h2 id="rm-t">Reincidência <em>&amp;</em> Maus Antecedentes</h2>
+    <p>Uma análise cronológica dos efeitos da condenação penal.</p>
+  </header>
+
+  <div class="rm-cards">
+    <article class="rm-card"><span class="k">Reincidência · segunda fase</span><h3>Agravante do art. 61, I</h3>
+      <p>Prática de novo crime após condenação anterior transitada em julgado, observadas as limitações do art. 64 do CP: o período depurador de cinco anos e a exclusão dos crimes militares próprios e políticos.</p></article>
+    <article class="rm-card"><span class="k">Maus antecedentes · primeira fase</span><h3>Circunstância judicial do art. 59</h3>
+      <p>Condenações definitivas juridicamente aptas à valoração negativa da vida criminal pregressa, quando não utilizadas para caracterizar a reincidência (Súm. 241 e 444 do STJ; STF, Tema 150).</p></article>
+  </div>
+
+  <div class="rm-ctrl">
+    <div class="grp" style="flex:1 1 420px"><span class="lbl">Exemplos interativos</span>
+      <div class="rm-ex" id="rmEx"></div></div>
+    <div class="rm-act">
+      <button class="btn" type="button" id="rmRestore">Restaurar exemplo</button>
+      <button class="btn" type="button" id="rmClear">Limpar simulação</button>
+    </div>
+  </div>
+
+  <div class="rm-nat">
+    <div class="grp"><span class="lbl" id="rmNatL">Natureza do crime anterior</span>
+      <div class="nat-opts" role="radiogroup" aria-labelledby="rmNatL">
+        <label style="--c: var(--rm-gold)"><input type="radio" name="rmNat" value="comum" checked><span class="dot"></span>Crime comum</label>
+        <label style="--c: var(--rm-green-hi)"><input type="radio" name="rmNat" value="politico"><span class="dot"></span>Crime político</label>
+        <label style="--c: var(--rm-wine-hi)"><input type="radio" name="rmNat" value="militar"><span class="dot"></span>Crime militar próprio</label>
+      </div></div>
+    <label class="fld"><span class="lbl">Natureza da infração posterior (crime em julgamento)</span>
+      <select id="rmPost">
+        <option value="comum">Crime comum</option>
+        <option value="militar">Crime militar próprio</option>
+        <option value="politico">Crime político</option>
+      </select></label>
+    <label class="fld"><span class="lbl">Situação do processo anterior</span>
+      <select id="rmStatus">
+        <option value="definitiva">Condenação transitada em julgado</option>
+        <option value="andamento">Ação penal em andamento ou condenação recorrível</option>
+        <option value="inquerito">Apenas inquérito policial</option>
+      </select></label>
+  </div>
+
+  <div class="rm-main">
+    <div class="rm-tl">
+      <div class="rm-tl-h">
+        <span class="hint">Arraste o marcador <b style="color:var(--rm-wine-hi)">Novo crime</b> ou clique na linha do tempo. Teclado: setas (±1 dia), Shift (±30 dias), PageUp/PageDown (±1 ano).</span>
+        <div class="zoom"><button type="button" id="rmZo" aria-label="Diminuir zoom">−</button><span id="rmZv">100%</span><button type="button" id="rmZi" aria-label="Aumentar zoom">+</button></div>
+      </div>
+      <div class="rm-scroll" id="rmScroll"><svg class="rm-svg" id="rmSvg" role="img" aria-label="Linha do tempo da condenação anterior e do novo crime"></svg></div>
+      <div class="rm-dates">
+        <label class="rm-date"><span class="lbl"><svg class="sh" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke="#E7DFCF" stroke-width="1.6"/></svg>1 · Crime anterior</span><input type="text" id="rmFato" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10"></label>
+        <label class="rm-date"><span class="lbl"><svg class="sh" viewBox="0 0 10 10"><rect x="2" y="2" width="6" height="6" transform="rotate(45 5 5)" fill="#B1AA9D"/></svg>2 · Recebimento da denúncia</span><input type="text" id="rmDen" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10"></label>
+        <label class="rm-date"><span class="lbl"><svg class="sh" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.5" fill="#B79B5B"/></svg>3 · Trânsito em julgado</span><input type="text" id="rmTrans" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10"></label>
+        <label class="rm-date"><span class="lbl"><svg class="sh" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="#9C7757"/></svg>4 · Cumprimento ou extinção</span><input type="text" id="rmExt" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10"></label>
+        <label class="rm-date nv"><span class="lbl"><svg class="sh" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.5" fill="#8E4853" stroke="#E7DFCF"/></svg>Novo crime</span><input type="text" id="rmNovoIn" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10"></label>
+      </div>
+      <div class="rm-opts">
+        <label class="rm-chk"><input type="checkbox" id="rmPend">A pena anterior ainda não estava cumprida ou extinta na data do novo crime</label>
+      </div>
+      <details class="rm-adv" id="rmAdv">
+        <summary>Avançado · sursis e livramento condicional</summary>
+        <div class="rm-adv-b">
+          <label class="fld"><span class="lbl">Benefício na condenação anterior</span>
+            <select id="rmBen"><option value="nenhum">Nenhum</option><option value="sursis">Suspensão condicional da pena (sursis)</option><option value="livramento">Livramento condicional</option></select></label>
+          <label class="fld"><span class="lbl" id="rmBenDL">Início do período de prova</span><input type="text" id="rmBenD" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" aria-labelledby="rmBenDL"></label>
+          <label class="rm-chk" style="padding-bottom:10px"><input type="checkbox" id="rmRev">O benefício foi revogado</label>
+          <p>Art. 64, I, in fine: computa-se no quinquênio o período de prova do sursis ou do livramento, se não houver revogação. O marco é a audiência admonitória (LEP, art. 160) ou a cerimônia do livramento (LEP, art. 137), segundo Greco e Masson. Havendo revogação, o prazo volta a correr da extinção da pena.</p>
+        </div>
+      </details>
+    </div>
+
+    <aside class="rm-res" aria-live="polite" aria-label="Análise jurídica">
+      <div class="rm-res-h"><h3>Análise jurídica</h3></div>
+      <div class="rm-big">
+        <div><span>Reincidência</span><b class="pill" id="rmR">—</b></div>
+        <div><span>Maus antecedentes</span><b class="pill" id="rmA">—</b></div>
+      </div>
+      <dl class="rm-dl" id="rmDl"></dl>
+      <div class="rm-fund"><h4>Fundamentação</h4><div id="rmFund" style="display:grid;gap:10px"></div></div>
+    </aside>
+  </div>
+
+  <details class="rm-why" id="rmWhy">
+    <summary>Por que esse é o resultado?</summary>
+    <div class="why-b">
+      <div class="why-cols">
+        <div><h4>Requisitos da reincidência · arts. 63 e 64</h4><ul class="req" id="rmReqR"></ul></div>
+        <div><h4>Requisitos dos maus antecedentes · art. 59</h4><ul class="req" id="rmReqA"></ul></div>
+      </div>
+      <div class="dout">
+        <div><b>Três requisitos em ordem cronológica</b><p>Crime anterior, condenação definitiva por ele e prática de novo crime depois do trânsito em julgado. O crime cometido no próprio dia do trânsito não gera reincidência, e o CP adota a reincidência ficta: pouco importa se a pena anterior foi cumprida.</p><cite>Masson, itens 34.10.1.3 e 34.10.1.6 · Greco, cap. 36</cite></div>
+        <div><b>Trânsito em julgado não é extinção da pena</b><p>O quinquênio do art. 64, I, corre da data em que a pena foi efetivamente cumprida ou extinta, e não do trânsito em julgado nem da decisão que declara a extinção. Com sursis ou livramento não revogados, corre do início do período de prova.</p><cite>Masson, item 34.10.1.7 · Greco, cap. 36 (LEP, arts. 137 e 160)</cite></div>
+        <div><b>Crimes militares próprios e políticos</b><p>Não geram reincidência pelo CP (art. 64, II). Só o militar próprio é excluído; o impróprio conta. Se o novo crime também for militar próprio, a reincidência é regida pelo art. 71 do CPM. Para Masson, essas condenações podem configurar maus antecedentes.</p><cite>Greco (com Zaffaroni e Pierangeli) · Masson, item 34.10.1.11</cite></div>
+        <div><b>Maus antecedentes</b><p>Somente condenações definitivas que não sirvam à reincidência. Inquéritos e ações em curso não servem (Súm. 444). A condenação pode transitar depois do novo crime, desde que o fato seja anterior; fato posterior não é antecedente. O período depurador não se aplica (STF, Tema 150), mas o juiz pode deixar de valorar condenação muito antiga, fundamentadamente.</p><cite>Masson, item 34.9.2 · Greco, cap. 36 · STF, RE 593.818 (Tema 150)</cite></div>
+        <div><b>Contagem do prazo (art. 10 do CP)</b><p>Conta-se o primeiro dia e exclui-se o último. Com cumprimento ou extinção da pena em 12/05/2000, o período depurador vai até 11/05/2005, inclusive: o crime praticado até essa data gera reincidência; a partir de 12/05/2005, não.</p><cite>Art. 10 do Código Penal</cite></div>
+        <div><b>Bis in idem</b><p>A mesma condenação não pode ser agravante e circunstância judicial ao mesmo tempo (Súm. 241). Havendo condenações distintas, uma pode gerar a reincidência e outra os maus antecedentes.</p><cite>Masson, item 34.10.1.12 · Greco, cap. 36</cite></div>
+      </div>
+    </div>
+  </details>
+
+  <section class="rm-quiz" aria-labelledby="qzT">
+    <h3 id="qzT">Teste seu conhecimento</h3>
+    <div class="qz-nav" id="qzNav"></div>
+    <p class="qz-q" id="qzQ"></p>
+    <div class="qz-tl"><svg class="rm-svg" id="qzSvg" role="img" aria-label="Linha do tempo do exercício"></svg></div>
+    <div class="qz-ans" id="qzAns">
+      <button type="button" data-a="reinc">Reincidência</button>
+      <button type="button" data-a="ant">Maus antecedentes</button>
+      <button type="button" data-a="nenhum">Nenhum dos dois</button>
+    </div>
+    <div class="qz-fb" id="qzFb" hidden></div>
+    <div class="qz-foot"><button class="btn" type="button" id="qzLoad">Abrir este caso no simulador</button><button class="btn" type="button" id="qzNext">Próxima questão</button></div>
+  </section>
+ </div>
+</section>
+
+<!-- ===================== EXERCÍCIOS ===================== -->
+<div class="fase in" id="exercicios">
+  <div class="fase-h"><span class="num">§</span><h2>Exercícios</h2><p>Calcule a pena-base e a pena provisória de cada caso com base no Código Penal. Informe as respostas em anos, meses e dias e clique em Corrigir para ver o resultado ideal e o quanto a sua resposta se aproximou dele.</p></div>
+  <div class="exs" id="exs"></div>
+  <p class="formula" style="margin-top:18px">Aproximação = 100% − (diferença entre a sua resposta e o resultado ideal ÷ resultado ideal), com mínimo de 0%. Contagem em dias, com 1 mês = 30 dias.</p>
+</div>
 </main>
 
-<footer class="in"><p>Ferramenta de apoio ao estudo da dosimetria. Os limites em abstrato devem ser conferidos na redação do Código Penal vigente na data do fato, e a escolha da fração de exasperação é ato fundamentado do julgador, sem direito subjetivo do réu a critério matemático específico.</p></footer>
+<footer class="in"><p>Ferramenta de apoio ao estudo da dosimetria. Os limites em abstrato devem ser conferidos na redação do Código Penal vigente na data do fato. As frações de exasperação e de atenuação são parâmetros jurisprudenciais, e não direito subjetivo do réu; a escolha concreta é ato fundamentado do julgador.</p></footer>
 
 <script>
 (function () {
   "use strict";
 
-  // ---------- Catálogo de tipos penais (Código Penal) ----------
+  /* =========================================================
+     DADOS
+     ========================================================= */
   const L1539 = "Lei 15.397/2026";
   const CAT = [
     { g: "Crimes contra a pessoa", i: [
@@ -413,18 +951,19 @@ footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px so
   ];
   const BY = {};
   CAT.forEach(g => g.i.forEach(c => { BY[c[0]] = { id: c[0], art: c[1], nome: c[2], esp: c[3], min: c[4], max: c[5] }; }));
+  const QUALIF = ["121q", "155q", "157lg", "157m", "157mant", "121A"];
 
-  // ---------- Circunstâncias do art. 59 ----------
   const CIRCS = [
     { id: "culp", t: "Culpabilidade", m: "a culpabilidade",
       d: "Maior ou menor reprovabilidade da conduta, conforme a intensidade do dolo ou da culpa. Não se confunde com a culpabilidade como elemento do crime." },
     { id: "ant", t: "Antecedentes", m: "os antecedentes",
       d: "Vida pregressa do réu.",
-      n: "Somente condenação definitiva que não gere reincidência. Inquéritos e ações em curso não servem (Súm. 444, STJ); a mesma condenação não agrava duas vezes (Súm. 241, STJ)." },
+      n: "Somente condenação definitiva que não gere reincidência. Inquéritos e ações em curso não servem (Súm. 444, STJ); a mesma condenação não agrava duas vezes (Súm. 241, STJ). Condenação por fato anterior com trânsito posterior configura maus antecedentes (TJRS, Ap. 5029819-78.2013)." },
     { id: "soc", t: "Conduta social", m: "a conduta social",
       d: "Comportamento do agente na comunidade, no trabalho e na família." },
     { id: "pers", t: "Personalidade do agente", m: "a personalidade do agente",
-      d: "Índole, qualidades morais, agressividade e caráter do agente." },
+      d: "Índole, qualidades morais, agressividade e caráter do agente.",
+      n: "Não pode ser valorada negativamente só com base na certidão de antecedentes (TJRS, Ap. 5032094-40.2022)." },
     { id: "mot", t: "Motivos do crime", m: "os motivos do crime",
       d: "Razões que levaram ao delito: ódio, ambição, cobiça, amor à família etc.",
       n: "Não valorar o motivo que já configure qualificadora, agravante, atenuante ou causa de aumento ou diminuição, sob pena de bis in idem." },
@@ -434,19 +973,81 @@ footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px so
       d: "Danosidade da ação além do resultado típico: trauma da vítima, desamparo de dependentes etc." },
     { id: "vit", t: "Comportamento da vítima", m: "o comportamento da vítima",
       d: "Provocação ou estímulo da vítima à conduta criminosa.",
-      w: "Segundo a jurisprudência do STJ, o comportamento da vítima é circunstância neutra ou favorável ao réu e não autoriza a elevação da pena-base." }
+      w: "Segundo o STJ, o comportamento da vítima é circunstância neutra ou favorável ao réu e não autoriza a elevação da pena-base." }
   ];
 
-  // ---------- Utilitários de tempo (1 ano = 12 meses; 1 mês = 30 dias) ----------
+  // Agravantes: P = preponderante (art. 67)
+  const AGS = [
+    { id: "a", art: "Art. 61, II, a", t: "Por motivo fútil ou torpe", s: "motivo fútil ou torpe", P: true,
+      n: "Motivo determinante. Não incide se já qualifica o crime (ex.: art. 121, § 2º, I e II)." },
+    { id: "b", art: "Art. 61, II, b", t: "Para facilitar ou assegurar a execução, a ocultação, a impunidade ou vantagem de outro crime", s: "conexão com outro crime", P: true,
+      n: "Ligada à finalidade do agente, tratada como motivo determinante." },
+    { id: "c", art: "Art. 61, II, c", t: "À traição, de emboscada, mediante dissimulação ou outro recurso que dificultou ou tornou impossível a defesa do ofendido", s: "traição, emboscada ou recurso que dificultou a defesa", P: false,
+      n: "Não preponderante (TJRS, Ap. 5004331-20.2022). Qualificadora remanescente do homicídio pode ser deslocada para cá (Ap. 5032094-40.2022)." },
+    { id: "d", art: "Art. 61, II, d", t: "Com emprego de veneno, fogo, explosivo, tortura ou outro meio insidioso ou cruel, ou de que podia resultar perigo comum", s: "meio insidioso, cruel ou de perigo comum", P: false },
+    { id: "e", art: "Art. 61, II, e", t: "Contra ascendente, descendente, irmão ou cônjuge", s: "crime contra ascendente, descendente, irmão ou cônjuge", P: false },
+    { id: "f", art: "Art. 61, II, f", t: "Com abuso de autoridade ou prevalecendo-se de relações domésticas, de coabitação ou de hospitalidade, ou com violência contra a mulher na forma da lei específica", s: "abuso de autoridade ou de relações domésticas", P: false,
+      n: "De caráter objetivo; cede à menoridade relativa, mas não é anulada por ela (TJRS, Ap. 5002276-52.2018)." },
+    { id: "g", art: "Art. 61, II, g", t: "Com abuso de poder ou violação de dever inerente a cargo, ofício, ministério ou profissão", s: "abuso de poder ou violação de dever funcional", P: false },
+    { id: "h", art: "Art. 61, II, h", t: "Contra criança, maior de 60 anos, enfermo ou mulher grávida", s: "vítima criança, maior de 60 anos, enferma ou grávida", P: false },
+    { id: "i", art: "Art. 61, II, i", t: "Quando o ofendido estava sob a imediata proteção da autoridade", s: "ofendido sob proteção da autoridade", P: false },
+    { id: "j", art: "Art. 61, II, j", t: "Em ocasião de incêndio, naufrágio, inundação ou qualquer calamidade pública, ou de desgraça particular do ofendido", s: "calamidade pública ou desgraça particular do ofendido", P: false },
+    { id: "l", art: "Art. 61, II, l", t: "Em estado de embriaguez preordenada", s: "embriaguez preordenada", P: false },
+    { id: "m", art: "Art. 61, II, m", t: "Nas dependências de instituição de ensino (Lei 15.159/2025)", s: "crime em instituição de ensino", P: false },
+    { id: "p1", art: "Art. 62, I", t: "Promove ou organiza a cooperação no crime ou dirige a atividade dos demais agentes", s: "direção da atividade criminosa", P: false,
+      n: "Não é bis in idem com a condição de mandante (TJRS, Ap. 5032094-40.2022)." },
+    { id: "p2", art: "Art. 62, II", t: "Coage ou induz outrem à execução material do crime", s: "coação ou indução de outrem", P: false },
+    { id: "p3", art: "Art. 62, III", t: "Instiga ou determina a cometer o crime alguém sujeito à sua autoridade ou não punível", s: "instigação de subordinado ou não punível", P: false },
+    { id: "p4", art: "Art. 62, IV", t: "Executa o crime, ou nele participa, mediante paga ou promessa de recompensa", s: "paga ou promessa de recompensa", P: true,
+      n: "Ligada ao motivo (torpe), portanto preponderante." }
+  ];
+  const ATS = [
+    { id: "men", art: "Art. 65, I", t: "Menor de 21 anos na data do fato ou maior de 70 anos na data da sentença", s: "menoridade relativa ou senilidade", P: true, al: true,
+      n: "Sempre preponderante (STJ, AgRg no AREsp 2.142.094/SP). Prevalece sobre agravantes objetivas, mas não as neutraliza (TJRS, Ap. 5002276-52.2018). Afastada em crime com violência sexual contra a mulher (Lei 15.160/2025)." },
+    { id: "des", art: "Art. 65, II", t: "Desconhecimento da lei", s: "desconhecimento da lei", P: false },
+    { id: "rv", art: "Art. 65, III, a", t: "Motivo de relevante valor social ou moral", s: "relevante valor social ou moral", P: true,
+      n: "Motivo determinante; preponderante." },
+    { id: "rep", art: "Art. 65, III, b", t: "Procurou evitar ou minorar as consequências do crime, ou reparou o dano antes do julgamento", s: "minoração das consequências ou reparação do dano", P: false },
+    { id: "coa", art: "Art. 65, III, c", t: "Coação resistível, cumprimento de ordem de autoridade superior ou violenta emoção provocada por ato injusto da vítima", s: "coação resistível, ordem superior ou violenta emoção", P: false },
+    { id: "conf", art: "Art. 65, III, d", t: "Confessou espontaneamente, perante a autoridade, a autoria do crime", s: "confissão espontânea", P: true, al: true,
+      n: "Vale mesmo parcial, qualificada, extrajudicial ou retratada, e ainda que não usada na sentença (Súm. 545, STJ; REsp 1.972.098/SC). Compensa-se integralmente com a reincidência (Tema 585)." },
+    { id: "mul", art: "Art. 65, III, e", t: "Cometeu o crime sob a influência de multidão em tumulto, se não o provocou", s: "influência de multidão em tumulto", P: false },
+    { id: "ino", art: "Art. 66", t: "Circunstância relevante, anterior ou posterior ao crime, não prevista em lei", s: "atenuante inominada", P: false,
+      n: "Exige circunstância excepcional demonstrada; vulnerabilidade social genérica não basta (TJRS, Ap. 5082989-42.2025)." }
+  ];
+  const AGBY = {}; AGS.forEach(x => AGBY[x.id] = x);
+  const ATBY = {}; ATS.forEach(x => ATBY[x.id] = x);
+
+  const PREC = [
+    { h: "Ap. 5029819-78.2013.8.21.0001", c: "TJRS · 3ª Câmara Criminal · homicídio simples",
+      p: "Pena-base de 7 anos (1/6 sobre o mínimo, por maus antecedentes). Na 2ª fase, reincidência e confissão qualificada (o réu alegou legítima defesa) foram compensadas integralmente, por serem igualmente preponderantes (REsp 1.341.370/MT).",
+      r: "Pena provisória: 7 anos" },
+    { h: "Ap. 5002276-52.2018.8.21.0025", c: "TJRS · 8ª Câmara Criminal · estupro de vulnerável",
+      p: "Pena-base de 12 anos (1/6 sobre o mínimo por vetorial). A sentença neutralizou a agravante do art. 61, II, f, com a menoridade; o Tribunal reformou: a menoridade prepondera, mas não anula a agravante. Aplicou +1/6 e, em seguida, −1/5. Registrou que a Lei 15.160/2025 não alcança os fatos, anteriores a ela.",
+      r: "Pena provisória: 11 anos, 2 meses e 12 dias" },
+    { h: "Ap. 5032094-40.2022.8.21.0015", c: "TJRS · 3ª Câmara Criminal · homicídios qualificados e furto",
+      p: "A qualificadora remanescente (recurso que dificultou a defesa) foi usada como agravante (art. 61, II, c). Aumento de 1/6 por agravante sobre a pena-base, somados; multirreincidência (cinco condenações) elevada a 1/5. Para corréu de 19 anos, a menoridade preponderou sobre a agravante, com redução de 1 ano.",
+      r: "2º fato: de 16 anos, 4 meses e 24 dias para 25 anos, 1 mês e 22 dias" },
+    { h: "Ap. 5003204-18.2023.8.21.0028", c: "TJRS · 2ª Câmara Criminal · homicídio qualificado",
+      p: "A defesa pediu que a confissão compensasse os motivos valorados na 1ª fase. O Tribunal negou: o art. 67 só resolve o concurso entre agravantes e atenuantes da 2ª fase. Redução de 1/6 da pena-base pela confissão, fração paradigma.",
+      r: "De 18 anos e 3 meses para 15 anos, 2 meses e 15 dias" },
+    { h: "Ap. 5082989-42.2025.8.21.0001", c: "TJRS · 7ª Câmara Criminal · roubos majorados",
+      p: "Reconheceu a confissão parcial (Súm. 545, STJ), mas recusou a compensação com a reincidência, por entender que a confissão não integra a personalidade. A reincidência preponderou, com saldo de aumento. Posição divergente do STJ (Tema 585).",
+      r: "De 5 anos para 5 anos e 6 meses" },
+    { h: "Ap. 5004331-20.2022.8.21.0062", c: "TJRS · 8ª Câmara Criminal · roubo, estupro de vulnerável e outros",
+      p: "No roubo, duas atenuantes preponderantes (menoridade e confissão) contra uma agravante não preponderante (emboscada) levaram a pena provisória ao mínimo legal. Na resistência e na lesão, a menoridade foi reconhecida, mas não reduziu a pena abaixo do mínimo (Súm. 231).",
+      r: "Roubo: de 5 anos para 4 anos (mínimo)" }
+  ];
+
+  /* =========================================================
+     UTILITÁRIOS DE TEMPO (1 ano = 12 meses; 1 mês = 30 dias)
+     ========================================================= */
   const toD = (a, m, d) => a * 360 + m * 30 + d;
-  const num = (x, dec) => {
-    const r = Math.round(x * Math.pow(10, dec)) / Math.pow(10, dec);
-    return String(r).replace(".", ",");
-  };
+  const num = (x, dec) => String(Math.round(x * Math.pow(10, dec)) / Math.pow(10, dec)).replace(".", ",");
   function dur(days) {
     days = Math.round(days * 1000) / 1000;
     const a = Math.floor(days / 360 + 1e-9);
-    let r = days - a * 360;
+    const r = days - a * 360;
     const m = Math.floor(r / 30 + 1e-9);
     const d = Math.round((r - m * 30) * 100) / 100;
     const p = [];
@@ -465,7 +1066,6 @@ footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px so
     if (d) s += (s ? " " : "") + d + "d";
     return s || "0";
   };
-
   const UN = ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove","dez","onze","doze","treze","quatorze","quinze","dezesseis","dezessete","dezoito","dezenove"];
   const DZ = ["","","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"];
   function ext(n) {
@@ -482,10 +1082,95 @@ footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px so
     return p.length <= 1 ? (p[0] || "0 (zero) dia") : p.slice(0, -1).join(", ") + " e " + p[p.length - 1];
   }
   const joinE = arr => arr.length <= 1 ? (arr[0] || "") : arr.slice(0, -1).join(", ") + " e " + arr[arr.length - 1];
-  const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  function frac(f) {
+    for (let d = 1; d <= 60; d++) { const n = Math.round(f * d); if (n > 0 && Math.abs(n / d - f) < 1e-9) return n + "/" + d; }
+    return num(f, 4);
+  }
 
-  // ---------- Montagem da interface ----------
+  /* =========================================================
+     MOTOR DE CÁLCULO
+     ========================================================= */
+  function penaBase(min, max, n, crit) {
+    const tm = (min + max) / 2;
+    let inc, teto, critTxt;
+    if (crit === "A") { inc = (tm - min) / 8; teto = tm; critTxt = "1/8 (um oitavo) do intervalo entre a pena mínima e o termo médio"; }
+    else if (crit === "B") { inc = (max - min) / 8; teto = max; critTxt = "1/8 (um oitavo) do intervalo entre as penas mínima e máxima cominadas"; }
+    else { inc = min / 6; teto = max; critTxt = "1/6 (um sexto) da pena mínima cominada"; }
+    const raw = min + n * inc;
+    const capped = Math.min(raw, teto);
+    const pb = Math.floor(capped + 1e-9);
+    return { tm, inc, teto, critTxt, raw, capped, pb, frac: capped - pb > 1e-9 };
+  }
+
+  /* Segunda fase.
+     1) Reincidência × confissão (Tema 585): simples → anulam-se; multirreincidência → saldo proporcional (fração da reincidência − 1/6).
+     2) Circunstâncias de mesma natureza (preponderante × preponderante; comum × comum) anulam-se aos pares.
+     3) Preponderante × não preponderante: ambas incidem; a preponderante vale 1/5 e a outra 1/6 (TJRS, Ap. 5002276-52.2018).
+     4) As demais incidem em 1/6 cada (fração paradigma).
+     5) Resultado limitado ao mínimo (Súm. 231) e ao máximo cominados; frações de dia desprezadas (art. 11). */
+  function penaProv(o) {
+    const A = [], T = [], comp = [], applied = [], flags = {};
+    if (o.reinc === "simples") A.push({ id: "rein", s: "reincidência", P: true, f: 1 / 6 });
+    if (o.reinc === "multi") A.push({ id: "rein", s: "multirreincidência", P: true, f: o.multiFrac });
+    o.ags.forEach(id => { const x = AGBY[id]; if (x) A.push({ id, s: x.s, P: x.P, f: 1 / 6 }); });
+    o.ats.forEach(id => {
+      const x = ATBY[id]; if (!x) return;
+      if (id === "men" && o.sexual) { flags.lei15160 = true; return; }
+      T.push({ id, s: x.s, P: x.P, f: 1 / 6 });
+    });
+
+    const r = A.find(x => x.id === "rein"), c = T.find(x => x.id === "conf");
+    if (r && c) {
+      c.used = true;
+      if (o.reinc === "simples") {
+        r.used = true;
+        comp.push({ k: "tema585", a: r, t: c });
+      } else {
+        r.resid = true; r.f = Math.max(0, o.multiFrac - 1 / 6);
+        comp.push({ k: "multi", a: r, t: c, f: r.f });
+      }
+    }
+    const free = (L, P) => L.find(x => !x.used && !x.resid && (P === undefined || x.P === P));
+    [true, false].forEach(P => {
+      let a, t;
+      while ((a = free(A, P)) && (t = free(T, P))) { a.used = t.used = true; comp.push({ k: "igual", a, t }); }
+    });
+    let a, t;
+    while ((a = free(A)) && (t = free(T))) {
+      a.used = t.used = true;
+      const fa = a.P ? 1 / 5 : 1 / 6, ft = t.P ? 1 / 5 : 1 / 6;
+      comp.push({ k: "prep", a, t, fa, ft });
+      applied.push({ sign: 1, f: fa, s: a.s, why: a.P ? "prepondera" : "cede" });
+      applied.push({ sign: -1, f: ft, s: t.s, why: t.P ? "prepondera" : "cede" });
+    }
+    A.forEach(x => {
+      if (x.resid) { if (x.f > 0) applied.push({ sign: 1, f: x.f, s: x.s, why: "saldo" }); }
+      else if (!x.used) applied.push({ sign: 1, f: x.f, s: x.s, why: "" });
+    });
+    T.forEach(x => { if (!x.used) applied.push({ sign: -1, f: x.f, s: x.s, why: "" }); });
+
+    let raw;
+    if (o.modo === "cascata") {
+      raw = o.pb;
+      applied.filter(x => x.sign > 0).forEach(x => { x.val = raw * x.f; raw += x.val; });
+      applied.filter(x => x.sign < 0).forEach(x => { x.val = raw * x.f; raw -= x.val; });
+    } else {
+      raw = o.pb;
+      applied.forEach(x => { x.val = o.pb * x.f; raw += x.sign * x.val; });
+    }
+    let val = raw, lim = "";
+    if (raw < o.min - 1e-9) { val = o.min; lim = "min"; }
+    if (raw > o.max + 1e-9) { val = o.max; lim = "max"; }
+    const pp = Math.floor(val + 1e-9);
+    return { A, T, comp, applied, raw, val, pp, lim, flags, frac: val - pp > 1e-9 };
+  }
+
+  /* =========================================================
+     INTERFACE · 1ª FASE
+     ========================================================= */
   const $ = id => document.getElementById(id);
+  const ICON = '<svg class="ico" aria-hidden="true"><use href="#warn"/></svg>';
   const sel = $("crime");
   sel.insertAdjacentHTML("beforeend", '<option value="custom">Personalizado (informar limites)</option>');
   CAT.forEach(g => {
@@ -495,19 +1180,28 @@ footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px so
     sel.appendChild(og);
   });
 
-  const box = $("circs");
   CIRCS.forEach((c, k) => {
     const el = document.createElement("div");
     el.className = "circ";
     el.id = "box-" + c.id;
     el.innerHTML =
       '<label class="head"><span><span class="tag">Desfavorável</span><span class="ct"><span class="ord">' + (k + 1) + 'º</span>' + c.t + '</span>' +
-      '<span class="cd">' + c.d + '</span></span><input type="checkbox" id="c-' + c.id + '"></label>' +
+      '<span class="cd">' + c.d + '</span></span><input class="box" type="checkbox" id="c-' + c.id + '"></label>' +
       (c.n ? '<div class="note">' + c.n + '</div>' : "") +
-      (c.w ? '<div class="warn" id="w-' + c.id + '" hidden>' + c.w + '</div>' : "") +
+      (c.w ? '<div class="warn" id="w-' + c.id + '" hidden>⚠ ' + c.w + '</div>' : "") +
       '<input type="text" id="f-' + c.id + '" placeholder="Fundamento concreto (opcional)" aria-label="Fundamento concreto: ' + c.t + '" hidden>';
-    box.appendChild(el);
+    $("circs").appendChild(el);
   });
+
+  function itemHTML(x, pre) {
+    return '<label class="item"><input class="box" type="checkbox" id="' + pre + x.id + '">' +
+      '<span><span class="it"><span class="art">' + x.art + '</span>' + x.t + '</span>' +
+      ((x.P || x.al) ? '<span class="meta">' + (x.P ? '<span class="chip">Preponderante</span>' : "") + (x.al ? '<span class="chip al">⚠ Regra especial</span>' : "") + '</span>' : "") +
+      (x.n ? '<span class="in-note">' + x.n + '</span>' : "") + '</span></label>';
+  }
+  $("ags").innerHTML = AGS.map(x => itemHTML(x, "ag-")).join("");
+  $("ats").innerHTML = ATS.map(x => itemHTML(x, "at-")).join("");
+  $("prec").innerHTML = PREC.map(p => '<div class="pc"><div class="h"><b>' + p.h + '</b><span>' + p.c + '</span></div><p>' + p.p + '</p><span class="r">' + p.r + '</span></div>').join("");
 
   const limIds = ["minA","minM","minD","maxA","maxM","maxD"];
   function loadCrime(id) {
@@ -517,14 +1211,31 @@ footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px so
     $("maxA").value = c.max[0]; $("maxM").value = c.max[1]; $("maxD").value = c.max[2];
     $("especie").value = c.esp;
   }
+  const v = id => { const x = parseInt($(id).value, 10); return isNaN(x) || x < 0 ? 0 : x; };
+  const radio = name => (document.querySelector('input[name="' + name + '"]:checked') || {}).value;
 
-  // ---------- Cálculo ----------
-  function calc() {
-    const v = id => { const x = parseInt($(id).value, 10); return isNaN(x) || x < 0 ? 0 : x; };
+  function ruler(el, min, max, teto, inc, mark, ghost, tm) {
+    const pct = d => ((d - min) / (max - min)) * 100;
+    let h = '<div class="bar"></div>';
+    h += '<div class="zone" style="left:0;width:' + pct(teto) + '%"></div>';
+    h += '<div class="fill" style="width:' + pct(mark) + '%"></div>';
+    if (inc) for (let k = 1; k <= 8; k++) { const t = min + k * inc; if (t <= teto + 1e-9) h += '<div class="tick" style="left:' + pct(t) + '%"></div>'; }
+    if (ghost !== undefined && Math.abs(ghost - mark) > 1e-9) h += '<div class="mark ghost" style="left:' + pct(ghost) + '%" data-l="PB ' + short(ghost) + '"></div>';
+    h += '<div class="mark" style="left:' + pct(mark) + '%" data-l="' + short(mark) + '"></div>';
+    h += '<span class="lab l" style="left:0">' + short(min) + "</span>";
+    if (tm !== undefined) h += '<span class="lab" style="left:' + pct(tm) + '%">TM ' + short(tm) + "</span>";
+    h += '<span class="lab r" style="left:100%">' + short(max) + "</span>";
+    el.innerHTML = h;
+  }
+  const alertHTML = (title, body, info) => '<div class="alert' + (info ? " info" : "") + '">' + ICON + '<div><h4>' + title + '</h4><p>' + body + '</p></div></div>';
+
+  let S = null; // estado da 1ª fase
+
+  function calc1() {
     const min = toD(v("minA"), v("minM"), v("minD"));
     const max = toD(v("maxA"), v("maxM"), v("maxD"));
     const esp = $("especie").value;
-    const crit = (document.querySelector('input[name="crit"]:checked') || {}).value || "A";
+    const crit = radio("crit") || "A";
     const c = BY[sel.value];
     const desf = CIRCS.filter(x => $("c-" + x.id).checked);
     const n = desf.length;
@@ -544,79 +1255,282 @@ footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px so
     if (min <= 0 || max <= min) {
       err.hidden = false;
       err.textContent = min <= 0 ? "Informe uma pena mínima maior que zero." : "A pena máxima deve ser maior que a pena mínima.";
-      $("pb").textContent = "—"; $("pbesp").textContent = ""; $("pbsub").textContent = ""; $("memo").innerHTML = ""; $("minuta").textContent = ""; $("track").innerHTML = ""; $("fx").hidden = true;
-      return;
+      ["pb","pbesp","pbsub","minuta"].forEach(id => $(id).textContent = id === "pb" ? "—" : "");
+      $("memo").innerHTML = ""; $("track").innerHTML = ""; $("fx").hidden = true;
+      S = null; return;
     }
     err.hidden = true;
 
-    const tm = (min + max) / 2;
-    let inc, teto, critTxt;
-    if (crit === "A") { inc = (tm - min) / 8; teto = tm; critTxt = "1/8 (um oitavo) do intervalo entre a pena mínima e o termo médio"; }
-    else if (crit === "B") { inc = (max - min) / 8; teto = max; critTxt = "1/8 (um oitavo) do intervalo entre as penas mínima e máxima cominadas"; }
-    else { inc = min / 6; teto = max; critTxt = "1/6 (um sexto) da pena mínima cominada"; }
+    const R = penaBase(min, max, n, crit);
+    S = { min, max, esp, crit, c, desf, n, R };
 
-    const raw = min + n * inc;
-    const capped = Math.min(raw, teto);
-    const pb = Math.floor(capped + 1e-9);
-    const frac = capped - pb > 1e-9;
-
-    // Resultado principal
-    $("pb").textContent = dur(pb);
+    $("pb").textContent = dur(R.pb);
     $("pbesp").textContent = "de " + esp;
-    $("pbsub").innerHTML = "<b>" + n + "</b> de 8 circunstâncias desfavoráveis" +
-      (n ? " · acréscimo de " + dur(pb - min) + " sobre o mínimo" : " · mínimo legal");
+    $("pbsub").innerHTML = "<b>" + n + "</b> de 8 circunstâncias desfavoráveis" + (n ? " · acréscimo de " + dur(R.pb - min) + " sobre o mínimo" : " · mínimo legal");
 
-    // Memória de cálculo
-    const art = c ? c.art + ", " + esp : esp;
-    const s = [];
-    s.push(["Limites em abstrato (" + art + ")", "mínimo de " + dur(min) + " · máximo de " + dur(max)]);
-    s.push(["Termo médio", "(" + dur(min) + " + " + dur(max) + ") ÷ 2 = <b>" + dur(tm) + "</b>"]);
-    if (crit === "A") {
-      s.push(["Intervalo entre o mínimo e o termo médio", dur(tm) + " − " + dur(min) + " = " + dur(tm - min) + " (" + meses(tm - min) + ")"]);
-      s.push(["Valor de cada circunstância", meses(tm - min) + " ÷ 8 = <b>" + meses(inc) + "</b> (" + dur(inc) + ")"]);
-    } else if (crit === "B") {
-      s.push(["Intervalo entre o mínimo e o máximo", dur(max) + " − " + dur(min) + " = " + dur(max - min) + " (" + meses(max - min) + ")"]);
-      s.push(["Valor de cada circunstância", meses(max - min) + " ÷ 8 = <b>" + meses(inc) + "</b> (" + dur(inc) + ")"]);
-    } else {
-      s.push(["Base da fração", "pena mínima de " + dur(min) + " (" + meses(min) + ")"]);
-      s.push(["Valor de cada circunstância", meses(min) + " ÷ 6 = <b>" + meses(inc) + "</b> (" + dur(inc) + ")"]);
-    }
-    s.push(["Circunstâncias desfavoráveis: " + n + " de 8", n ? n + " × " + meses(inc) + " = " + meses(n * inc) + " (" + dur(n * inc) + ")" : "nenhuma; a pena permanece no mínimo"]);
-    s.push(["Pena-base", dur(min) + (n ? " + " + dur(Math.min(n * inc, teto - min)) : "") + " = <b>" + dur(pb) + "</b>"]);
-    $("memo").innerHTML = s.map(x => '<li><span><span class="k">' + x[0] + '</span><span class="v">' + x[1] + "</span></span></li>").join("");
-
-    const fx = $("fx");
+    $("memo").innerHTML = memo1(S).map(x => '<li><span><span class="k">' + x[0] + '</span><span class="v">' + x[1] + "</span></span></li>").join("");
     const notes = [];
-    if (raw > teto + 1e-9) notes.push("O acréscimo foi limitado ao teto da primeira fase (" + dur(teto) + ").");
-    if (frac) notes.push("Fração de dia desprezada (art. 11, CP): resultado exato de " + dur(capped) + ".");
-    fx.hidden = !notes.length; fx.textContent = notes.join(" ");
+    if (R.raw > R.teto + 1e-9) notes.push("O acréscimo foi limitado ao teto da primeira fase (" + dur(R.teto) + ").");
+    if (R.frac) notes.push("Fração de dia desprezada (art. 11, CP): resultado exato de " + dur(R.capped) + ".");
+    $("fx").hidden = !notes.length; $("fx").textContent = notes.join(" ");
 
-    // Régua da pena
-    const pct = d => ((d - min) / (max - min)) * 100;
-    let h = '<div class="bar"></div>';
-    h += '<div class="zone" style="left:0;width:' + pct(teto) + '%"></div>';
-    h += '<div class="fill" style="width:' + pct(pb) + '%"></div>';
-    for (let k = 1; k <= 8; k++) { const t = min + k * inc; if (t <= teto + 1e-9) h += '<div class="tick" style="left:' + pct(t) + '%"></div>'; }
-    h += '<div class="mark" style="left:' + pct(pb) + '%" data-l="' + short(pb) + '"></div>';
-    h += '<span class="lab l" style="left:0">' + short(min) + "</span>";
-    h += '<span class="lab" style="left:' + pct(tm) + '%">TM ' + short(tm) + "</span>";
-    h += '<span class="lab r" style="left:100%">' + short(max) + "</span>";
-    $("track").innerHTML = h;
+    ruler($("track"), min, max, R.teto, R.inc, R.pb, undefined, R.tm);
 
-    // Minuta
     let txt;
     if (!n) {
-      txt = "Na primeira fase da dosimetria, analisadas as circunstâncias judiciais do art. 59 do Código Penal, não se verificam vetoriais desfavoráveis ao réu, razão pela qual fixo a pena-base no mínimo legal, em " + durExt(pb) + " de " + esp + ".";
+      txt = "Na primeira fase da dosimetria, analisadas as circunstâncias judiciais do art. 59 do Código Penal, não se verificam vetoriais desfavoráveis ao réu, razão pela qual fixo a pena-base no mínimo legal, em " + durExt(R.pb) + " de " + esp + ".";
     } else {
       const lista = desf.map(x => { const f = $("f-" + x.id).value.trim(); return x.m + (f ? " (" + f + ")" : ""); });
       txt = "Na primeira fase da dosimetria, analisadas as circunstâncias judiciais do art. 59 do Código Penal, reputo desfavoráve" + (n === 1 ? "l " : "is ") + joinE(lista) +
-        ", sendo neutras ou favoráveis as demais. Adotada a fração de " + critTxt + " para cada circunstância negativa, fixo a pena-base em " + durExt(pb) + " de " + esp + ".";
+        ", sendo neutras ou favoráveis as demais. Adotada a fração de " + R.critTxt + " para cada circunstância negativa, fixo a pena-base em " + durExt(R.pb) + " de " + esp + ".";
     }
     $("minuta").textContent = txt;
     $("copied").hidden = true;
   }
 
-  // ---------- Eventos ----------
+  function memo1(st) {
+    const { min, max, esp, crit, c, n, R } = st;
+    const art = c ? c.art + ", " + esp : esp;
+    const s = [];
+    s.push(["Limites em abstrato (" + art + ")", "mínimo de " + dur(min) + " · máximo de " + dur(max)]);
+    s.push(["Termo médio", "(" + dur(min) + " + " + dur(max) + ") ÷ 2 = <b>" + dur(R.tm) + "</b>"]);
+    if (crit === "A") {
+      s.push(["Intervalo entre o mínimo e o termo médio", dur(R.tm) + " − " + dur(min) + " = " + dur(R.tm - min) + " (" + meses(R.tm - min) + ")"]);
+      s.push(["Valor de cada circunstância", meses(R.tm - min) + " ÷ 8 = <b>" + meses(R.inc) + "</b> (" + dur(R.inc) + ")"]);
+    } else if (crit === "B") {
+      s.push(["Intervalo entre o mínimo e o máximo", dur(max) + " − " + dur(min) + " = " + dur(max - min) + " (" + meses(max - min) + ")"]);
+      s.push(["Valor de cada circunstância", meses(max - min) + " ÷ 8 = <b>" + meses(R.inc) + "</b> (" + dur(R.inc) + ")"]);
+    } else {
+      s.push(["Base da fração", "pena mínima de " + dur(min) + " (" + meses(min) + ")"]);
+      s.push(["Valor de cada circunstância", meses(min) + " ÷ 6 = <b>" + meses(R.inc) + "</b> (" + dur(R.inc) + ")"]);
+    }
+    s.push(["Circunstâncias desfavoráveis: " + n + " de 8", n ? n + " × " + meses(R.inc) + " = " + meses(n * R.inc) + " (" + dur(n * R.inc) + ")" : "nenhuma; a pena permanece no mínimo"]);
+    s.push(["Pena-base", dur(min) + (n ? " + " + dur(Math.min(n * R.inc, R.teto - min)) : "") + " = <b>" + dur(R.pb) + "</b>"]);
+    return s;
+  }
+
+  /* =========================================================
+     INTERFACE · 2ª FASE
+     ========================================================= */
+  function inputs2() {
+    return {
+      reinc: radio("rein") || "nao",
+      multiFrac: 1 / parseInt($("multiFrac").value, 10),
+      ags: AGS.filter(x => $("ag-" + x.id).checked).map(x => x.id),
+      ats: ATS.filter(x => $("at-" + x.id).checked).map(x => x.id),
+      sexual: $("sexMulher").checked,
+      modo: radio("modo") || "soma"
+    };
+  }
+
+  function memo2(o, P, pb) {
+    const s = [];
+    s.push(["Pena-base (1ª fase)", "<b>" + dur(pb) + "</b>"]);
+    if (!P.A.length && !P.T.length) {
+      s.push(["Agravantes e atenuantes", "nenhuma; a pena provisória coincide com a pena-base"]);
+    }
+    P.comp.forEach(cp => {
+      if (cp.k === "tema585") s.push(["Compensação integral (STJ, Tema 585)", "reincidência × confissão espontânea: anulam-se"]);
+      else if (cp.k === "multi") s.push(["Compensação proporcional (multirreincidência)", frac(o.multiFrac) + " − 1/6 (confissão) = saldo de <b>+" + frac(cp.f) + "</b>"]);
+      else if (cp.k === "igual") s.push(["Compensação integral (mesma natureza)", cp.a.s + " × " + cp.t.s + ": anulam-se"]);
+      else if (cp.k === "prep") s.push(["Preponderância (art. 67)", (cp.t.P ? cp.t.s + " prepondera sobre " + cp.a.s : cp.a.s + " prepondera sobre " + cp.t.s) + ": +" + frac(cp.fa) + " e −" + frac(cp.ft)]);
+    });
+    if (P.applied.length) {
+      const base = o.modo === "cascata" ? "em cascata (agravantes primeiro)" : "sobre a pena-base";
+      const parts = P.applied.map(x => (x.sign > 0 ? "+ " : "− ") + frac(x.f) + " (" + dur(x.val) + ")");
+      s.push(["Frações aplicadas " + base, parts.join(" ")]);
+      s.push(["Resultado antes dos limites", dur(pb) + " → " + dur(P.raw)]);
+    }
+    if (P.lim === "min") s.push(["Súmula 231 do STJ", "resultado abaixo do mínimo; pena mantida em " + dur(o.min)]);
+    if (P.lim === "max") s.push(["Limite máximo", "resultado acima do máximo; pena limitada a " + dur(o.max)]);
+    s.push(["Pena provisória", "<b>" + dur(P.pp) + "</b>"]);
+    return s;
+  }
+
+  function calc2() {
+    const o = inputs2();
+    $("countAg").innerHTML = "<b>" + (o.ags.length + (o.reinc !== "nao" ? 1 : 0)) + "</b> agravantes";
+    $("countAt").innerHTML = "<b>" + o.ats.length + "</b> atenuantes";
+    $("at-men").disabled = o.sexual;
+    if (o.sexual) $("at-men").checked = false, o.ats = o.ats.filter(x => x !== "men");
+
+    if (!S) {
+      ["pp","ppesp","ppsub","minuta2"].forEach(id => $(id).textContent = id === "pp" ? "—" : "");
+      $("memo2").innerHTML = ""; $("adj").innerHTML = ""; $("track2").innerHTML = "";
+      $("alerts2").innerHTML = alertHTML("Defina a pena-base", "Corrija os limites da primeira fase para calcular a pena provisória.");
+      return;
+    }
+    const pb = S.R.pb, min = S.min, max = S.max, esp = S.esp;
+    const P = penaProv(Object.assign({ pb, min, max }, o));
+    o.min = min; o.max = max;
+
+    $("pp").textContent = dur(P.pp);
+    $("ppesp").textContent = "de " + esp;
+    const diff = P.pp - pb;
+    $("ppsub").innerHTML = "a partir da pena-base de <b>" + dur(pb) + "</b>" +
+      (Math.abs(diff) < 1 ? " · sem alteração" : diff > 0 ? " · acréscimo de " + dur(diff) : " · redução de " + dur(-diff));
+    ruler($("track2"), min, max, max, 0, P.pp, pb);
+
+    // Ajustes
+    const rows = [];
+    P.comp.forEach(cp => {
+      if (cp.k === "tema585" || cp.k === "igual") rows.push('<div><span class="sg z">0</span><span>' + esc(cp.a.s) + " × " + esc(cp.t.s) + '</span><span class="vv">compensadas</span></div>');
+      if (cp.k === "multi") rows.push('<div><span class="sg z">±</span><span>multirreincidência × confissão</span><span class="vv">saldo +' + frac(cp.f) + '</span></div>');
+    });
+    P.applied.forEach(x => rows.push('<div><span class="sg ' + (x.sign > 0 ? "p" : "m") + '">' + (x.sign > 0 ? "+" : "−") + frac(x.f) + '</span><span>' + esc(x.s) + (x.why === "prepondera" ? " · prepondera" : x.why === "saldo" ? " · saldo da compensação" : "") + '</span><span class="vv">' + (x.sign > 0 ? "+" : "−") + short(Math.round(x.val)) + '</span></div>'));
+    $("adj").innerHTML = rows.length ? rows.join("") : '<span class="empty">Nenhuma agravante ou atenuante selecionada.</span>';
+
+    $("memo2").innerHTML = memo2(o, P, pb).map(x => '<li><span><span class="k">' + x[0] + '</span><span class="v">' + x[1] + "</span></span></li>").join("");
+
+    // Alertas dinâmicos
+    const al = [];
+    if (P.comp.some(x => x.k === "tema585")) al.push(alertHTML("Reincidência × confissão: anulam-se", "São <b>igualmente preponderantes</b> e se compensam integralmente (STJ, REsp 1.341.370/MT; Tema 585), ainda que a confissão seja parcial ou qualificada (TJRS, Ap. 5029819-78.2013). Atenção: a 7ª Câmara do TJRS já recusou essa compensação (Ap. 5082989-42.2025), em posição contrária ao STJ."));
+    if (P.comp.some(x => x.k === "multi")) al.push(alertHTML("Multirreincidência: prepondera a reincidência", "Com mais de uma condenação, a reincidência <b>prevalece</b> sobre a confissão e a compensação é apenas <b>proporcional</b> (STJ, Tema 585, revisado). O simulador desconta 1/6 da fração escolhida para a multirreincidência e aplica o saldo."));
+    else if (o.reinc === "multi") al.push(alertHTML("Multirreincidência: fração acima de 1/6", "A multiplicidade de condenações justifica aumento superior a 1/6, desde que fundamentado (TJRS, Ap. 5032094-40.2022, fração de 1/5).", true));
+    if (P.comp.some(x => x.k === "prep")) {
+      const men = P.comp.some(x => x.k === "prep" && x.t.id === "men");
+      al.push(alertHTML(men ? "Menoridade prepondera, mas não anula" : "Preponderância (art. 67)", (men ? "A menoridade relativa é <b>sempre preponderante</b> (STJ, AgRg no AREsp 2.142.094/SP), mas a agravante objetiva <b>continua incidindo</b>: não há neutralização (TJRS, Ap. 5002276-52.2018). " : "A circunstância preponderante prevalece sobre a não preponderante, sem anulá-la. ") +
+        "O simulador aplica 1/5 à preponderante e 1/6 à outra, critério da 8ª Câmara do TJRS. Outros julgados fixam saldo diverso (a 3ª Câmara reduziu 1 ano; a 8ª Câmara, em outro caso, levou a pena ao mínimo)."));
+    }
+    if (P.flags.lei15160 || (o.sexual && $("at-men").disabled)) al.push(alertHTML("Lei 15.160/2025: atenuante afastada", "Em crime que envolva <b>violência sexual contra a mulher</b>, praticado a partir de 04/07/2025, a menoridade relativa e a senilidade (art. 65, I) não atenuam a pena. Para fatos anteriores, a lei não retroage (TJRS, Ap. 5002276-52.2018)."));
+    if (P.lim === "min") al.push(alertHTML("Súmula 231 do STJ", "As atenuantes levariam a pena para " + dur(P.raw) + ", abaixo do mínimo legal. A atenuante é <b>reconhecida, mas não reduz</b> a pena aquém de " + dur(min) + " nesta fase (TJRS, Ap. 5004331-20.2022)."));
+    if (P.lim === "max") al.push(alertHTML("Limite máximo", "As agravantes levariam a pena para " + dur(P.raw) + ". Na segunda fase, a pena não ultrapassa o máximo cominado (" + dur(max) + ")."));
+    if (o.ats.includes("conf") && S.n > 0) al.push(alertHTML("A confissão não compensa a 1ª fase", "O art. 67 só resolve o concurso entre agravantes e atenuantes. A confissão <b>não anula</b> circunstância judicial negativa valorada na pena-base (TJRS, Ap. 5003204-18.2023).", true));
+    if (o.reinc !== "nao" && S.desf.some(x => x.id === "ant")) al.push(alertHTML("Súmula 241 do STJ", "A <b>mesma condenação</b> não pode servir como maus antecedentes e como reincidência. Confirme que são condenações distintas, como na Ap. 5082989-42.2025, em que uma foi usada para cada finalidade."));
+    if (S.c && QUALIF.includes(S.c.id) && o.ags.some(id => ["a", "c", "d"].includes(id))) al.push(alertHTML("Qualificadora × agravante", "Circunstância que <b>já qualifica</b> o crime não agrava de novo (bis in idem). Havendo duas qualificadoras, uma qualifica e a remanescente, se prevista no art. 61, pode incidir como agravante (TJRS, Ap. 5032094-40.2022).", true));
+    $("alerts2").innerHTML = al.join("");
+    $("alerts2").hidden = !al.length;
+
+    // Minuta
+    const agNomes = [], atNomes = [];
+    if (o.reinc === "simples") agNomes.push("do art. 61, I (reincidência)");
+    if (o.reinc === "multi") agNomes.push("do art. 61, I (multirreincidência)");
+    o.ags.forEach(id => agNomes.push("do " + AGBY[id].art.replace("Art.", "art.") + " (" + AGBY[id].s + ")"));
+    o.ats.forEach(id => atNomes.push("do " + ATBY[id].art.replace("Art.", "art.") + " (" + ATBY[id].s + ")"));
+    let t2 = "Na segunda fase, ";
+    if (!agNomes.length && !atNomes.length) t2 += "ausentes circunstâncias agravantes e atenuantes, mantenho a pena provisória em " + durExt(P.pp) + " de " + esp + ".";
+    else {
+      const parts = [];
+      if (agNomes.length) parts.push((agNomes.length > 1 ? "as agravantes " : "a agravante ") + joinE(agNomes));
+      if (atNomes.length) parts.push((atNomes.length > 1 ? "as atenuantes " : "a atenuante ") + joinE(atNomes));
+      t2 += "reconheço " + parts.join(", bem como ") + ". ";
+      P.comp.forEach(cp => {
+        if (cp.k === "tema585") t2 += "Compenso integralmente a reincidência com a confissão espontânea, por serem igualmente preponderantes (art. 67 do CP; STJ, Tema 585). ";
+        if (cp.k === "multi") t2 += "Tratando-se de réu multirreincidente, a reincidência prepondera e é compensada apenas proporcionalmente com a confissão, remanescendo o acréscimo de " + frac(cp.f) + ". ";
+        if (cp.k === "igual") t2 += "Compenso integralmente a circunstância de " + cp.a.s + " com a de " + cp.t.s + ", de igual natureza. ";
+        if (cp.k === "prep") t2 += "No concurso entre " + cp.a.s + " e " + cp.t.s + ", prepondera " + (cp.t.P ? "a atenuante" : "a agravante") + " (art. 67 do CP), sem neutralizar a outra, razão pela qual aplico " + frac(cp.fa) + " de aumento e " + frac(cp.ft) + " de redução. ";
+      });
+      const rest = P.applied.filter(x => !x.why);
+      if (rest.length) t2 += "Pela" + (rest.length > 1 ? "s demais circunstâncias" : " circunstância remanescente") + ", aplico a fração de 1/6 da pena-base. ";
+      if (P.lim === "min") t2 += "Em observância à Súmula 231 do STJ, a pena não pode ser reduzida aquém do mínimo legal nesta fase. ";
+      if (P.lim === "max") t2 += "A pena não pode ultrapassar o máximo cominado nesta fase. ";
+      t2 += "Fixo a pena provisória em " + durExt(P.pp) + " de " + esp + ".";
+    }
+    $("minuta2").textContent = t2;
+    $("copied2").hidden = true;
+  }
+
+  function calc() { calc1(); calc2(); }
+
+  /* =========================================================
+     EXERCÍCIOS
+     ========================================================= */
+  const EXS = [
+    { titulo: "Homicídio simples", tip: "Art. 121, caput, do CP",
+      txt: "Caio, após longa disputa por herança, matou o irmão, Rui, com golpes de faca. As provas indicam que planejou o crime por semanas, comprando a arma e estudando a rotina da vítima. Rui deixou três filhos menores que dependiam exclusivamente de sua renda. As demais circunstâncias do art. 59 são neutras. Caio é reincidente: possui uma condenação definitiva por furto, com pena extinta há dois anos. Em juízo, confessou a autoria.",
+      instr: "1ª fase pelo critério do termo médio. 2ª fase com a fração de 1/6 por circunstância, sobre a pena-base, observando a compensação e a preponderância.",
+      crime: "121", circ: ["culp", "cons"], crit: "A", reinc: "simples", ags: ["e"], ats: ["conf"], modo: "soma" },
+    { titulo: "Furto qualificado", tip: "Art. 155, § 4º, I, do CP (rompimento de obstáculo)",
+      txt: "Lucas, com 19 anos na data do fato, arrombou a porta de uma loja de eletrodomésticos e subtraiu vários aparelhos durante a enchente que levou o município a decretar calamidade pública, aproveitando-se da evacuação da área. Monitorou a loja por vários dias antes do crime. Possui uma condenação definitiva anterior por receptação, cuja pena foi extinta há sete anos. As demais circunstâncias do art. 59 são neutras. Lucas não confessou.",
+      instr: "1ª fase pelo critério do termo médio. Na 2ª fase, quando uma circunstância preponderante concorrer com uma não preponderante, aplique 1/5 à preponderante e 1/6 à outra, sobre a pena-base.",
+      crime: "155q", circ: ["culp", "ant"], crit: "A", reinc: "nao", ags: ["j"], ats: ["men"], modo: "soma",
+      obs: "A condenação extinta há mais de cinco anos não gera reincidência (art. 64, I), mas configura maus antecedentes (STF, Tema 150). A calamidade pública é agravante não preponderante; a menoridade relativa é preponderante, prevalece, mas não anula a agravante." },
+    { titulo: "Roubo", tip: "Art. 157, caput, do CP · fato em agosto de 2026",
+      txt: "Marta abordou uma senhora de 67 anos na saída de uma agência bancária e, mediante grave ameaça, subtraiu R$ 3.000,00. Mesmo depois de receber o dinheiro, empurrou a vítima ao chão, sem necessidade. A vítima usaria o valor para custear um tratamento médico, que precisou ser suspenso. Marta possui duas condenações definitivas anteriores por roubo, ambas dentro do período depurador. Confessou na delegacia e em juízo. As demais circunstâncias do art. 59 são neutras.",
+      instr: "Atenção à lei vigente na data do fato. 1ª fase pelo critério do termo médio. Na 2ª fase, adote 1/5 para a multirreincidência, com compensação proporcional com a confissão (1/5 − 1/6), e 1/6 para as demais circunstâncias, sobre a pena-base.",
+      crime: "157", circ: ["culp", "cons"], crit: "A", reinc: "multi", multiFrac: 1 / 5, ags: ["h"], ats: ["conf"], modo: "soma",
+      obs: "Fato posterior a 04/05/2026: aplica-se a pena de 6 a 10 anos (Lei 15.397/2026). As duas condenações já fundamentam a multirreincidência e não podem valorar também os antecedentes (Súm. 241, STJ). A vítima maior de 60 anos atrai o art. 61, II, h." }
+  ];
+
+  function solveEx(e) {
+    const c = BY[e.crime];
+    const min = toD(c.min[0], c.min[1], c.min[2]), max = toD(c.max[0], c.max[1], c.max[2]);
+    const R = penaBase(min, max, e.circ.length, e.crit);
+    const P = penaProv({ pb: R.pb, min, max, reinc: e.reinc, multiFrac: e.multiFrac || 1 / 5, ags: e.ags, ats: e.ats, sexual: false, modo: e.modo });
+    return { c, min, max, R, P };
+  }
+
+  function exHTML(e, k) {
+    const ansRow = (lbl, pre) => '<div class="ans"><span class="lbl">' + lbl + '</span><div class="triple">' +
+      '<div class="unit"><input id="' + pre + 'A" type="number" min="0" step="1" inputmode="numeric" aria-label="' + lbl + ', anos"><span>anos</span></div>' +
+      '<div class="unit"><input id="' + pre + 'M" type="number" min="0" step="1" inputmode="numeric" aria-label="' + lbl + ', meses"><span>m</span></div>' +
+      '<div class="unit"><input id="' + pre + 'D" type="number" min="0" step="1" inputmode="numeric" aria-label="' + lbl + ', dias"><span>d</span></div></div></div>';
+    return '<article class="ex" id="ex' + k + '">' +
+      '<div class="ex-q"><span class="eyebrow">Caso ' + (k + 1) + ' · ' + e.titulo + '</span>' +
+      '<h3 class="sub">' + e.tip + '</h3><p>' + e.txt + '</p><p class="instr">' + e.instr + '</p>' +
+      '<div><button class="btn" type="button" data-hint="' + k + '">Mostrar limites da pena</button></div>' +
+      '<div class="hintbox" id="hint' + k + '" hidden></div></div>' +
+      '<div class="ex-a">' + ansRow("Sua pena-base", "x" + k + "b") + ansRow("Sua pena provisória", "x" + k + "p") +
+      '<div class="ex-btns"><button class="btn solid" type="button" data-check="' + k + '">Corrigir</button><button class="btn" type="button" data-reset="' + k + '">Limpar</button></div>' +
+      '<div class="score" id="score' + k + '" hidden></div></div></article>';
+  }
+  $("exs").innerHTML = EXS.map(exHTML).join("");
+
+  function approx(ans, ideal) { return Math.max(0, 100 * (1 - Math.abs(ans - ideal) / ideal)); }
+  const pctClass = p => p >= 95 ? "hi" : p >= 75 ? "md" : "lo";
+
+  function check(k) {
+    const e = EXS[k], X = solveEx(e);
+    const rd = pre => toD(v(pre + "A"), v(pre + "M"), v(pre + "D"));
+    const ab = rd("x" + k + "b"), ap = rd("x" + k + "p");
+    const pB = approx(ab, X.R.pb), pP = approx(ap, X.P.pp), pT = (pB + pP) / 2;
+    const row = (lbl, ans, ideal, p) => '<div class="srow"><div class="top"><b>' + lbl + '</b><span class="pct ' + pctClass(p) + '">' + num(p, 1) + '%</span></div>' +
+      '<div class="pbar"><i style="width:' + p.toFixed(1) + '%"></i></div>' +
+      '<span class="cmp">Sua resposta: <strong>' + (ans ? dur(ans) : "não informada") + '</strong> · Resultado ideal: <strong>' + dur(ideal) + '</strong></span></div>';
+    const st = { min: X.min, max: X.max, esp: X.c.esp, crit: e.crit, c: X.c, n: e.circ.length, R: X.R };
+    const o = { modo: e.modo, multiFrac: e.multiFrac || 1 / 5, min: X.min, max: X.max };
+    const steps = memo1(st).concat(memo2(o, X.P, X.R.pb).slice(1));
+    const circNomes = e.circ.map(id => CIRCS.find(c => c.id === id).t.toLowerCase());
+    $("score" + k).innerHTML =
+      row("Pena-base", ab, X.R.pb, pB) + row("Pena provisória", ap, X.P.pp, pP) +
+      '<div class="overall"><span>Aproximação média</span><b>' + num(pT, 1) + '%</b></div>' +
+      '<details class="sol"><summary>Ver resolução</summary><ol>' +
+      '<li>Circunstâncias judiciais desfavoráveis: ' + joinE(circNomes) + '.</li>' +
+      steps.map(x => '<li>' + x[0] + ': ' + x[1].replace(/<\/?b>/g, "") + '</li>').join("") +
+      (e.obs ? '<li>' + e.obs + '</li>' : "") + '</ol></details>';
+    $("score" + k).hidden = false;
+  }
+
+  document.addEventListener("click", ev => {
+    const b = ev.target.closest("button");
+    if (!b) return;
+    if (b.dataset.check !== undefined) check(+b.dataset.check);
+    if (b.dataset.reset !== undefined) {
+      const k = b.dataset.reset;
+      ["b", "p"].forEach(t => ["A", "M", "D"].forEach(u => { $("x" + k + t + u).value = ""; }));
+      $("score" + k).hidden = true;
+    }
+    if (b.dataset.hint !== undefined) {
+      const k = +b.dataset.hint, e = EXS[k], c = BY[e.crime], h = $("hint" + k);
+      h.textContent = c.art + " · " + c.nome + ": " + c.esp + " de " + dur(toD(c.min[0], c.min[1], c.min[2])) + " a " + dur(toD(c.max[0], c.max[1], c.max[2])) + ".";
+      h.hidden = !h.hidden;
+      b.textContent = h.hidden ? "Mostrar limites da pena" : "Ocultar limites da pena";
+    }
+    if (b.dataset.src) {
+      const t = $(b.dataset.src).textContent, ok = $(b.dataset.ok);
+      const fallback = () => {
+        const r = document.createRange(); r.selectNodeContents($(b.dataset.src));
+        const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        ok.textContent = "Texto selecionado; use Ctrl+C"; ok.hidden = false;
+      };
+      try { navigator.clipboard.writeText(t).then(() => { ok.textContent = "Texto copiado"; ok.hidden = false; }, fallback); }
+      catch (e) { fallback(); }
+    }
+  });
+
+  /* =========================================================
+     EVENTOS
+     ========================================================= */
   sel.addEventListener("change", () => { if (sel.value !== "custom") loadCrime(sel.value); calc(); });
   limIds.forEach(id => $(id).addEventListener("input", () => {
     const c = BY[sel.value];
@@ -627,32 +1541,614 @@ footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px so
     calc();
   }));
   $("especie").addEventListener("change", calc);
-  document.querySelectorAll('input[name="crit"]').forEach(r => r.addEventListener("change", calc));
-  CIRCS.forEach(x => {
-    $("c-" + x.id).addEventListener("change", calc);
-    $("f-" + x.id).addEventListener("input", calc);
-  });
+  document.querySelectorAll('input[name="crit"], input[name="rein"], input[name="modo"]').forEach(r => r.addEventListener("change", calc));
+  $("multiFrac").addEventListener("change", () => { $("reinM").checked = true; calc(); });
+  $("sexMulher").addEventListener("change", calc);
+  CIRCS.forEach(x => { $("c-" + x.id).addEventListener("change", calc); $("f-" + x.id).addEventListener("input", calc1); });
+  AGS.forEach(x => $("ag-" + x.id).addEventListener("change", calc2));
+  ATS.forEach(x => $("at-" + x.id).addEventListener("change", calc2));
   $("clear").addEventListener("click", () => { CIRCS.forEach(x => { $("c-" + x.id).checked = false; }); calc(); });
 
-  $("copy").addEventListener("click", () => {
-    const t = $("minuta").textContent;
-    const fallback = () => {
-      const r = document.createRange(); r.selectNodeContents($("minuta"));
-      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
-      $("copied").textContent = "Texto selecionado; use Ctrl+C"; $("copied").hidden = false;
-    };
-    try {
-      navigator.clipboard.writeText(t).then(() => { $("copied").textContent = "Texto copiado"; $("copied").hidden = false; }, fallback);
-    } catch (e) { fallback(); }
-  });
+  // Exposição para testes
+  window.__dosimetria = { penaBase, penaProv, solveEx, EXS, toD, dur };
 
-  // ---------- Estado inicial: exemplo do homicídio simples com duas circunstâncias desfavoráveis ----------
+  // Estado inicial: homicídio simples, 2 circunstâncias; reincidente que confessou e matou o irmão
   sel.value = "121";
   loadCrime("121");
   $("c-culp").checked = true;
   $("c-cons").checked = true;
+  $("reinS").checked = true;
+  $("ag-e").checked = true;
+  $("at-conf").checked = true;
   calc();
 })();
 </script>
 
-</body></html>
+<script>
+/* =====================================================================
+   MÓDULO REINCIDÊNCIA & MAUS ANTECEDENTES
+   Camadas: (1) datas sem fuso, (2) motor jurídico puro, (3) linha do tempo SVG, (4) interface.
+   ===================================================================== */
+(function () {
+  "use strict";
+
+  /* ---------- 1. DATAS (número de dias UTC; sem fuso horário) ---------- */
+  const DAY = 86400000;
+  const dn = (y, m, d) => Math.round(Date.UTC(y, m - 1, d) / DAY);
+  const ymd = n => { const t = new Date(n * DAY); return [t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate()]; };
+  const pad = x => String(x).padStart(2, "0");
+  function parseBR(s) {
+    const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(s || "").trim());
+    if (!m) return null;
+    const d = +m[1], mo = +m[2], y = +m[3];
+    if (mo < 1 || mo > 12 || d < 1 || y < 1900 || y > 2100) return null;
+    const n = dn(y, mo, d), c = ymd(n);
+    return (c[0] === y && c[1] === mo && c[2] === d) ? n : null;
+  }
+  const fmtBR = n => { if (n == null) return "—"; const [y, m, d] = ymd(n); return pad(d) + "/" + pad(m) + "/" + y; };
+  // Aniversário de k anos; 29/02 em ano não bissexto passa a 01/03 (calendário comum, art. 10 do CP).
+  function addYears(n, k) {
+    const [y, m, d] = ymd(n), Y = y + k;
+    const leap = (Y % 4 === 0 && Y % 100 !== 0) || Y % 400 === 0;
+    return (m === 2 && d === 29 && !leap) ? dn(Y, 3, 1) : dn(Y, m, d);
+  }
+  const yearOf = n => ymd(n)[0];
+
+  /* ---------- 2. MOTOR JURÍDICO (sem acesso à interface) ---------- */
+  const NAT = { comum: "Crime comum", politico: "Crime político", militar: "Crime militar próprio" };
+
+  function analisar(x) {
+    const R = { reinc: "INDETERMINADO", ant: "DEPENDE DE ANÁLISE", sit: "G", fund: [], falta: [], seg: null, marks: {},
+      campos: { nat: NAT[x.natAnt], post: NAT[x.natPost], trans: "—", periodo: "—", cond: "—" } };
+    const P = (t, cls) => R.fund.push({ t, cls: cls || "" });
+
+    // G — dados insuficientes ou incoerentes
+    (x.invalid || []).forEach(f => R.falta.push(f + " (formato inválido)"));
+    if (x.fato == null && !(x.invalid || []).some(f => /crime anterior/.test(f))) R.falta.push("data do cometimento do crime anterior");
+    if (x.novo == null && !(x.invalid || []).some(f => /novo crime/.test(f))) R.falta.push("data do novo crime");
+    if (x.status === "definitiva" && x.transito == null && !(x.invalid || []).some(f => /trânsito/.test(f))) R.falta.push("data do trânsito em julgado");
+    const erros = [];
+    if (x.fato != null && x.denuncia != null && x.denuncia < x.fato) erros.push("o recebimento da denúncia é anterior ao crime anterior");
+    if (x.fato != null && x.novo != null && x.novo < x.fato) erros.push("o novo crime não pode ser anterior ao crime anterior; mova o marcador para depois de " + fmtBR(x.fato));
+    if (x.status === "definitiva" && x.transito != null) {
+      const b = x.denuncia != null ? x.denuncia : x.fato;
+      if (b != null && x.transito < b) erros.push("o trânsito em julgado é anterior ao " + (x.denuncia != null ? "recebimento da denúncia" : "crime anterior"));
+      if (x.extincao != null && x.extincao < x.transito) erros.push("o cumprimento ou a extinção da pena é anterior ao trânsito em julgado");
+      if (x.benef !== "nenhum" && x.benefData != null && x.benefData < x.transito) erros.push("o início do período de prova é anterior ao trânsito em julgado");
+    }
+    if (R.falta.length || erros.length) {
+      R.campos.cond = "Não avaliável";
+      P("<b>Dados insuficientes para conclusão jurídica.</b>", "warn");
+      if (R.falta.length) P("Informação faltante: " + R.falta.join("; ") + ".");
+      if (erros.length) P("Cronologia inválida: " + erros.join("; ") + ".");
+      P("O simulador não presume datas nem emite conclusão sem os marcos necessários.", "note");
+      return fin(R, x);
+    }
+
+    if (x.novo === x.fato) {
+      R.sit = "F0"; R.reinc = "NÃO"; R.ant = "DEPENDE DE ANÁLISE"; R.seg = "antes";
+      R.campos.cond = "Fatos praticados na mesma data";
+      P("Os dois fatos ocorreram na mesma data. Não há reincidência, pois o novo crime não pode ser posterior a um trânsito em julgado relativo a fato do mesmo dia (art. 63).");
+      P("A valoração como antecedente depende de saber se o fato da condenação foi efetivamente anterior ao crime em julgamento, o que a data, sozinha, não esclarece.", "note");
+      return fin(R, x);
+    }
+
+    // E — sem condenação definitiva
+    if (x.status !== "definitiva") {
+      R.sit = "E"; R.reinc = "NÃO"; R.ant = "NÃO CONFIGURADOS"; R.seg = "antes";
+      R.campos.trans = "Não há trânsito em julgado";
+      R.campos.cond = x.status === "inquerito" ? "Apenas inquérito policial" : "Ação penal em andamento ou condenação recorrível";
+      P("Sem condenação transitada em julgado, não há reincidência (art. 63) nem maus antecedentes.");
+      P("“É vedada a utilização de inquéritos policiais e ações penais em curso para agravar a pena-base” (Súm. 444, STJ). A presunção de não culpabilidade (CF, art. 5º, LVII) impede que anotações na folha de antecedentes, inclusive condenações pendentes de recurso, elevem a pena (Greco). Tampouco servem como conduta social.");
+      P("Se a condenação transitar em julgado antes da sentença do novo processo, poderá ser valorada como antecedente, pois o fato é anterior (Masson).", "note");
+      return fin(R, x);
+    }
+
+    const T = x.transito;
+    R.campos.trans = x.novo > T ? "Sim — trânsito em " + fmtBR(T) : (x.novo === T ? "Não — mesmo dia do trânsito (" + fmtBR(T) + ")" : "Não — trânsito apenas em " + fmtBR(T));
+
+    // D — crime anterior político ou militar próprio
+    if (x.natAnt !== "comum") {
+      R.seg = x.novo > T ? "excl" : "antes";
+      if (x.natAnt === x.natPost && x.novo > T) {
+        R.sit = "D2"; R.reinc = "INDETERMINADO"; R.ant = "DEPENDE DE ANÁLISE";
+        R.campos.periodo = "Regime especial";
+        R.campos.cond = "Definitiva; ambos os crimes são " + (x.natAnt === "militar" ? "militares próprios" : "políticos");
+        if (x.natAnt === "militar") P("Crime militar próprio seguido de outro crime militar próprio: a exclusão do art. 64, II, do CP não se aplica, e a reincidência passa a ser regida pelo art. 71 do Código Penal Militar (Masson). O simulador não aplica automaticamente as regras do CP a esse regime.");
+        else P("Crime político seguido de outro crime político exige análise da legislação especial aplicável. A Lei de Segurança Nacional, citada pela doutrina, foi revogada pela Lei 14.197/2021. O simulador não emite conclusão automática.");
+        return fin(R, x);
+      }
+      R.sit = "D"; R.reinc = "NÃO"; R.ant = "DEPENDE DE ANÁLISE";
+      R.campos.periodo = "Não se aplica (art. 64, II)";
+      R.campos.cond = "Definitiva, por " + (x.natAnt === "militar" ? "crime militar próprio" : "crime político");
+      P("Art. 64, II, do CP: para efeito de reincidência, não se consideram os crimes " + (x.natAnt === "militar" ? "militares próprios" : "políticos") + ". Ainda que o novo crime seja posterior ao trânsito em julgado, não há reincidência com base nessa condenação.");
+      if (x.natAnt === "militar") P("A exclusão alcança apenas o crime militar <b>próprio</b>, que só o militar pode cometer (ex.: deserção, motim). O militar impróprio, previsto também no CP (ex.: homicídio), gera reincidência normalmente (Greco, com Zaffaroni e Pierangeli; Masson).", "note");
+      else P("A exclusão alcança os crimes políticos próprios e impróprios, pois a lei não distingue (Greco; Masson).", "note");
+      P("Maus antecedentes: para Masson, a condenação definitiva por crime militar próprio ou político <b>caracteriza</b> maus antecedentes, pois a vedação do art. 64, II, limita-se à reincidência. A valoração exige fundamentação concreta e análise do caso.");
+      return fin(R, x);
+    }
+
+    // Infração posterior militar própria: regime do CPM
+    if (x.natPost === "militar" && x.novo > T) {
+      R.sit = "M"; R.reinc = "INDETERMINADO"; R.ant = "DEPENDE DE ANÁLISE"; R.seg = "reinc";
+      R.campos.periodo = "Regime do Código Penal Militar";
+      R.campos.cond = "Definitiva, por crime comum";
+      P("O crime em julgamento é militar próprio e será julgado segundo o Código Penal Militar, cujo art. 71 disciplina a reincidência. O simulador não presume que as regras dos arts. 63 e 64 do CP se aplicam automaticamente a esse regime.");
+      return fin(R, x);
+    }
+
+    // A — novo crime antes (ou no dia) do trânsito
+    if (x.novo <= T) {
+      R.sit = "A"; R.reinc = "NÃO"; R.ant = "POSSÍVEIS"; R.seg = "antes";
+      R.campos.periodo = "Não se aplica: não houve reincidência";
+      R.campos.cond = "Definitiva, mas transitou " + (x.novo === T ? "no mesmo dia do" : "depois do") + " novo crime";
+      if (x.novo === T) P("O novo crime foi praticado <b>na data</b> do trânsito em julgado. A reincidência exige crime cometido <b>depois</b> do trânsito (art. 63); praticado no mesmo dia, não se caracteriza a recidiva (Masson).");
+      else P("O novo crime (" + fmtBR(x.novo) + ") é anterior ao trânsito em julgado (" + fmtBR(T) + "). Não há reincidência com base nessa condenação, que não retroage (art. 63).");
+      if (x.denuncia != null && x.novo >= x.denuncia) P("O recebimento da denúncia (" + fmtBR(x.denuncia) + ") não substitui o trânsito em julgado: o marco constitutivo da reincidência é a condenação definitiva.", "note");
+      P("Maus antecedentes: possíveis. Basta condenação definitiva por <b>fato anterior</b> ao crime em julgamento, ainda que o trânsito tenha ocorrido depois dele (Masson, citando o STF; Greco). A valoração exige fundamentação.");
+      return fin(R, x);
+    }
+
+    // Novo crime posterior ao trânsito, crime comum
+    // Modo jurídico
+    let start = null, startTxt = "";
+    const benOk = x.benef !== "nenhum" && !x.revogado;
+    if (benOk) {
+      if (x.benefData == null) {
+        R.falta.push(x.benef === "sursis" ? "data da audiência admonitória do sursis" : "data da cerimônia do livramento condicional");
+        R.campos.cond = "Definitiva"; R.campos.periodo = "Indeterminado";
+        P("<b>Dados insuficientes para conclusão jurídica.</b>", "warn");
+        P("Informação faltante: " + R.falta.join("; ") + ". Com " + (x.benef === "sursis" ? "sursis" : "livramento condicional") + " não revogado, o quinquênio corre do início do período de prova (art. 64, I).");
+        return fin(R, x);
+      }
+      start = x.benefData;
+      startTxt = x.benef === "sursis" ? "audiência admonitória do sursis" : "cerimônia do livramento condicional";
+    } else if (x.pendente || (x.extincao != null && x.extincao >= x.novo)) {
+      R.sit = "B"; R.reinc = "SIM"; R.ant = "NÃO CONFIGURADOS"; R.seg = "reinc";
+      R.campos.periodo = "Ainda não iniciado: pena não cumprida nem extinta";
+      R.campos.cond = "Definitiva e eficaz para reincidência";
+      P("O novo crime foi praticado depois do trânsito em julgado (" + fmtBR(T) + "), quando a pena anterior ainda não estava cumprida ou extinta. O período depurador sequer começou a correr: há reincidência (art. 63). O CP adota a reincidência ficta, que independe do cumprimento da pena (Masson).");
+      P("A mesma condenação não pode ser usada também como maus antecedentes (Súm. 241, STJ).");
+      return fin(R, x);
+    } else if (x.extincao == null) {
+      R.falta.push("data do cumprimento ou da extinção da pena (ou indicação de que a pena ainda não estava extinta)");
+      R.campos.cond = "Definitiva"; R.campos.periodo = "Indeterminado: falta o marco inicial";
+      P("<b>Dados insuficientes para conclusão jurídica.</b>", "warn");
+      P("O novo crime é posterior ao trânsito em julgado, mas falta a " + R.falta[0] + ". O período depurador corre dessa data, e não do trânsito em julgado; o simulador não presume o marco.");
+      return fin(R, x);
+    } else {
+      start = x.extincao; startTxt = "cumprimento ou extinção da pena";
+    }
+
+    const end = addYears(start, 5);
+    R.marks.depStart = start; R.marks.depEnd = end;
+    R.campos.periodo = "De " + fmtBR(start) + " (" + startTxt + ") até " + fmtBR(end - 1) + ", inclusive. Conta-se o primeiro dia e exclui-se o último (art. 10 do CP)";
+    if (x.novo < end) {
+      R.sit = "B"; R.reinc = "SIM"; R.ant = "NÃO CONFIGURADOS"; R.seg = "reinc";
+      R.campos.cond = "Definitiva e eficaz para reincidência";
+      P("O novo crime (" + fmtBR(x.novo) + ") é posterior ao trânsito em julgado (" + fmtBR(T) + ") e não decorreu período superior a 5 anos desde o " + startTxt + " (" + fmtBR(start) + "). Há reincidência (arts. 63 e 64, I), agravante preponderante da segunda fase (arts. 61, I, e 67).");
+      if (x.novo === end - 1) P("O novo crime ocorreu no último dia do período depurador (" + fmtBR(end - 1) + "): conta-se o primeiro dia (" + fmtBR(start) + ") e exclui-se o último.", "note");
+      P("A mesma condenação <b>não</b> pode ser valorada também como maus antecedentes (Súm. 241, STJ). Outra condenação, distinta, poderia.");
+    } else {
+      R.sit = "C"; R.reinc = "NÃO"; R.ant = "POSSÍVEIS"; R.seg = "apos";
+      R.campos.cond = "Definitiva, alcançada pelo período depurador";
+      P("O período depurador correu de " + fmtBR(start) + " (" + startTxt + ") até " + fmtBR(end - 1) + ". O novo crime (" + fmtBR(x.novo) + ") foi praticado depois dele, de modo que a condenação não prevalece para efeito de reincidência (art. 64, I).");
+      P("Maus antecedentes: possíveis. O período depurador não se aplica aos maus antecedentes (STF, Tema 150; Masson, que adota o sistema da perpetuidade para os antecedentes). O juiz pode, fundamentadamente, deixar de valorar condenação muito antiga ou de pouca relevância.");
+    }
+    if (x.benef !== "nenhum" && x.revogado) P("Como o benefício foi revogado, o prazo corre da extinção da pena, e não do início do período de prova.", "note");
+    if (x.natPost === "politico") P("O crime em julgamento é político; a exclusão do art. 64, II, refere-se à condenação anterior, de modo que a análise acima se mantém.", "note");
+    return fin(R, x);
+  }
+
+  // Requisitos para a seção "Por que esse é o resultado?"
+  function fin(R, x) {
+    const def = x.status === "definitiva" && x.transito != null;
+    const ok = v => v === undefined ? null : v;
+    const insuf = R.sit === "G";
+    let prazo = null;
+    if (R.sit === "B") prazo = true;
+    else if (R.sit === "C") prazo = false;
+    R.reqR = [
+      { t: "Crime anterior apto a gerar reincidência (não militar próprio nem político, art. 64, II)", v: insuf ? null : x.natAnt === "comum" },
+      { t: "Condenação anterior transitada em julgado", v: x.status !== "definitiva" ? false : (x.transito == null ? null : true) },
+      { t: "Novo crime praticado depois do trânsito em julgado (art. 63)", v: (insuf || !def || x.novo == null) ? (x.status !== "definitiva" ? false : null) : x.novo > x.transito },
+      { t: "Novo crime praticado dentro do período depurador, contado do cumprimento, da extinção ou do início do período de prova (art. 64, I)", v: ok(prazo === null ? undefined : prazo) },
+      { t: "Infração posterior sujeita às regras do CP (não militar própria)", v: insuf ? null : x.natPost !== "militar" }
+    ];
+    R.reqA = [
+      { t: "Condenação definitiva (Súm. 444, STJ)", v: x.status !== "definitiva" ? false : (x.transito == null ? null : true) },
+      { t: "Fato da condenação anterior ao crime em julgamento", v: (x.fato == null || x.novo == null) ? null : (x.novo === x.fato ? null : x.fato < x.novo) },
+      { t: "Condenação não utilizada para a reincidência (Súm. 241, STJ)", v: insuf ? null : R.reinc !== "SIM" },
+      { t: "Valoração fundamentada; o período depurador não a impede (STF, Tema 150)", v: null }
+    ];
+    return R;
+  }
+
+  /* ---------- 3. LINHA DO TEMPO (SVG) ---------- */
+  const C = { bg: "#15171C", panel: "#202329", gold: "#B79B5B", ivory: "#E7DFCF", beige: "#B1AA9D", green: "#14584D", greenHi: "#4FA593", wine: "#8E4853", wineHi: "#C98A95", bronze: "#9C7757", line: "rgba(231,223,207,.18)" };
+  const NS = "http://www.w3.org/2000/svg";
+  const SEG_COLOR = { pre: C.beige, antes: C.bronze, reinc: C.wineHi, apos: C.greenHi, excl: C.greenHi };
+
+  function makeTimeline(svg, opts) {
+    const g = {};
+    ["under", "seg", "over", "novo"].forEach(k => { g[k] = document.createElementNS(NS, "g"); svg.appendChild(g[k]); });
+    if (opts.interactive) {
+      g.novo.setAttribute("id", "rmNovo");
+      g.novo.setAttribute("tabindex", "0");
+      g.novo.setAttribute("role", "slider");
+      g.novo.setAttribute("aria-label", "Data do novo crime");
+    }
+    const st = { W: 900, H: opts.H || 300, M: 46, d0: 0, d1: 1, axisY: opts.axisY || 176 };
+    const X = d => st.M + (d - st.d0) / (st.d1 - st.d0) * (st.W - 2 * st.M);
+    const D = px => st.d0 + (px - st.M) / (st.W - 2 * st.M) * (st.d1 - st.d0);
+
+    function domain(x, R) {
+      const L = [x.fato, x.denuncia, x.transito, x.extincao, x.benef !== "nenhum" ? x.benefData : null, R.marks.depEnd, x.novo].filter(v => v != null);
+      if (!L.length) { const t = dn(2020, 1, 1); return [t - 1500, t + 1500]; }
+      let lo = Math.min.apply(null, L), hi = Math.max.apply(null, L);
+      const span = Math.max(hi - lo, 365);
+      const p = Math.max(span * 0.09, 200);
+      return [lo - p, hi + p];
+    }
+
+    function el(tag, a, txt) {
+      let s = "<" + tag;
+      for (const k in a) s += " " + k + '="' + a[k] + '"';
+      return txt != null ? s + ">" + txt + "</" + tag + ">" : s + "/>";
+    }
+
+    function draw(x, R, keep) {
+      const w = Math.max(opts.minW || 680, Math.round(opts.width() * (opts.zoom ? opts.zoom() : 1)));
+      st.W = w;
+      if (!keep) { const dm = domain(x, R); st.d0 = dm[0]; st.d1 = dm[1]; }
+      svg.setAttribute("width", w); svg.setAttribute("height", st.H); svg.setAttribute("viewBox", "0 0 " + w + " " + st.H);
+      const ay = st.axisY;
+      let u = "";
+
+      // Grade de anos
+      const y0 = yearOf(st.d0), y1 = yearOf(st.d1);
+      const pxY = 365.25 * (w - 2 * st.M) / (st.d1 - st.d0);
+      const step = pxY >= 56 ? 1 : pxY * 2 >= 56 ? 2 : pxY * 5 >= 56 ? 5 : 10;
+      for (let y = y0; y <= y1 + 1; y++) {
+        if (y % step) continue;
+        const d = dn(y, 1, 1); if (d < st.d0 || d > st.d1) continue;
+        const px = X(d).toFixed(1);
+        u += el("line", { x1: px, x2: px, y1: 54, y2: st.H - 30, stroke: "rgba(231,223,207,.06)" });
+        u += el("text", { x: px, y: st.H - 12, "text-anchor": "middle", "font-size": 11, fill: C.beige, "font-variant-numeric": "tabular-nums" }, y);
+      }
+
+      // Faixas
+      if (R.marks.depEnd != null) {
+        const a = X(R.marks.depStart), b = X(R.marks.depEnd);
+        u += el("rect", { x: a.toFixed(1), y: ay - 30, width: Math.max(1, b - a).toFixed(1), height: 60, fill: "rgba(20,88,77,.32)", stroke: "rgba(79,165,147,.55)" });
+        u += el("text", { x: ((a + b) / 2).toFixed(1), y: ay - 38, "text-anchor": "middle", "font-size": 11, fill: C.greenHi, "letter-spacing": ".06em" }, "Período depurador · art. 64, I (5 anos)");
+      }
+      // Eixo
+      u += el("line", { x1: st.M - 20, x2: w - st.M + 20, y1: ay, y2: ay, stroke: C.line, "stroke-width": 2 });
+      g.under.innerHTML = u;
+
+      // Segmentos jurídicos
+      const segs = [];
+      const endR = R.marks.depEnd != null ? R.marks.depEnd : null;
+      if (x.fato != null) segs.push(["pre", st.d0, x.fato]);
+      if (x.fato != null) segs.push(["antes", x.fato, x.transito != null && x.status === "definitiva" ? x.transito : st.d1]);
+      if (x.transito != null && x.status === "definitiva") {
+        if (x.natAnt !== "comum") segs.push(["excl", x.transito, st.d1]);
+        else { segs.push(["reinc", x.transito, endR != null ? endR : st.d1]); if (endR != null) segs.push(["apos", endR, st.d1]); }
+      }
+      let s = "";
+      segs.forEach(([k, a, b]) => {
+        const on = R.seg === k;
+        s += el("line", { x1: X(a).toFixed(1), x2: X(b).toFixed(1), y1: ay, y2: ay, stroke: SEG_COLOR[k], "stroke-width": on ? 7 : 3, "stroke-opacity": on ? 1 : .32, "stroke-linecap": "butt" });
+      });
+      g.seg.innerHTML = s;
+
+      // Marcos com rótulos sem sobreposição
+      const mk = [];
+      if (x.fato != null) mk.push({ d: x.fato, n: "Crime anterior", sh: "c" });
+      if (x.denuncia != null) mk.push({ d: x.denuncia, n: "Denúncia recebida", sh: "d" });
+      if (x.transito != null && x.status === "definitiva") mk.push({ d: x.transito, n: "Trânsito em julgado", sh: "t" });
+      if (x.extincao != null && x.status === "definitiva") mk.push({ d: x.extincao, n: "Extinção da pena", sh: "e" });
+      if (x.benef !== "nenhum" && x.benefData != null && x.status === "definitiva") mk.push({ d: x.benefData, n: x.benef === "sursis" ? "Audiência admonitória" : "Cerimônia do livramento", sh: "b" });
+      if (R.marks.depEnd != null) mk.push({ d: R.marks.depEnd - 1, n: "Fim do período depurador", sh: "f", sub: "até " });
+      mk.sort((a, b) => a.d - b.d);
+      const rows = [-1e9, -1e9, -1e9];
+      let o = "";
+      mk.forEach(m => {
+        const px = X(m.d);
+        let r = 0; while (r < 2 && px - rows[r] < 128) r++;
+        rows[r] = px;
+        const ly = ay + 34 + r * 34;
+        o += el("line", { x1: px.toFixed(1), x2: px.toFixed(1), y1: ay + 10, y2: ly - 10, stroke: "rgba(231,223,207,.28)", "stroke-dasharray": "2 3" });
+        const anchor = px < st.M + 40 ? "start" : px > w - st.M - 40 ? "end" : "middle";
+        o += el("text", { x: px.toFixed(1), y: ly, "text-anchor": anchor, "font-size": 10, fill: C.beige, "letter-spacing": ".12em" }, m.n.toUpperCase());
+        o += el("text", { x: px.toFixed(1), y: ly + 14, "text-anchor": anchor, "font-size": 12.5, fill: C.ivory, "font-weight": 600, "font-variant-numeric": "tabular-nums" }, (m.sub || "") + fmtBR(m.d));
+        const P = px.toFixed(1);
+        if (m.sh === "c") o += el("circle", { cx: P, cy: ay, r: 7, fill: C.panel, stroke: C.ivory, "stroke-width": 2 });
+        if (m.sh === "d") o += el("rect", { x: px - 6, y: ay - 6, width: 12, height: 12, fill: C.beige, transform: "rotate(45 " + P + " " + ay + ")" });
+        if (m.sh === "t") { o += el("circle", { cx: P, cy: ay, r: 13, fill: "none", stroke: C.gold, "stroke-opacity": .5 }); o += el("circle", { cx: P, cy: ay, r: 8.5, fill: C.gold }); }
+        if (m.sh === "e") o += el("rect", { x: px - 6.5, y: ay - 6.5, width: 13, height: 13, fill: C.bronze });
+        if (m.sh === "b") o += el("polygon", { points: (px) + "," + (ay - 8) + " " + (px + 7) + "," + (ay + 6) + " " + (px - 7) + "," + (ay + 6), fill: C.greenHi });
+        if (m.sh === "f") o += el("circle", { cx: P, cy: ay, r: 7, fill: C.bg, stroke: C.greenHi, "stroke-width": 2.5 });
+        if (m.sh === "g") o += el("circle", { cx: P, cy: ay, r: 7, fill: C.bg, stroke: C.gold, "stroke-width": 2.5, "stroke-dasharray": "3 2" });
+      });
+      g.over.innerHTML = o;
+      placeNovo(x);
+    }
+
+    function placeNovo(x) {
+      if (x.novo == null) { g.novo.innerHTML = ""; return; }
+      const px = Math.max(st.M - 20, Math.min(st.W - st.M + 20, X(x.novo)));
+      const ay = st.axisY;
+      const anchor = px < st.M + 50 ? "start" : px > st.W - st.M - 50 ? "end" : "middle";
+      g.novo.innerHTML =
+        el("rect", { x: -26, y: 8, width: 52, height: ay - 2, fill: "transparent" }) +
+        el("line", { x1: 0, x2: 0, y1: 84, y2: ay, stroke: C.wineHi, "stroke-width": 1.5, "stroke-dasharray": "3 3" }) +
+        el("circle", { class: "halo", cx: 0, cy: 70, r: 20, fill: "rgba(142,72,83,.22)" }) +
+        el("circle", { cx: 0, cy: 70, r: 12, fill: C.wine, stroke: C.ivory, "stroke-width": 2 }) +
+        el("circle", { cx: 0, cy: ay, r: 4, fill: C.wineHi }) +
+        el("text", { x: anchor === "start" ? -10 : anchor === "end" ? 10 : 0, y: 26, "text-anchor": anchor, "font-size": 10, fill: C.wineHi, "letter-spacing": ".16em", "font-weight": 700 }, "NOVO CRIME") +
+        el("text", { x: anchor === "start" ? -10 : anchor === "end" ? 10 : 0, y: 43, "text-anchor": anchor, "font-size": 13.5, fill: C.ivory, "font-weight": 600, "font-variant-numeric": "tabular-nums" }, fmtBR(x.novo));
+      g.novo.setAttribute("transform", "translate(" + px.toFixed(1) + ",0)");
+      if (opts.interactive) g.novo.setAttribute("aria-valuetext", fmtBR(x.novo));
+    }
+
+    return { draw, placeNovo, st, X, D, g };
+  }
+
+  /* ---------- 4. INTERFACE ---------- */
+  const $ = id => document.getElementById(id);
+  const IN = { fato: "rmFato", denuncia: "rmDen", transito: "rmTrans", extincao: "rmExt", novo: "rmNovoIn", benefData: "rmBenD" };
+  const LABEL = { fato: "data do crime anterior", denuncia: "data do recebimento da denúncia", transito: "data do trânsito em julgado", extincao: "data do cumprimento ou extinção", novo: "data do novo crime", benefData: "data do início do período de prova" };
+  const state = { modo: "juridico", zoom: 1, ex: 0 };
+
+  const EXEMPLOS = [
+    { n: "Reincidência", natAnt: "comum", natPost: "comum", status: "definitiva", fato: "10/03/2015", denuncia: "02/06/2015", transito: "20/08/2017", extincao: "20/08/2019", novo: "15/04/2022" },
+    { n: "Crime antes do trânsito", natAnt: "comum", natPost: "comum", status: "definitiva", fato: "05/02/2016", denuncia: "10/05/2016", transito: "14/09/2018", extincao: "14/09/2020", novo: "03/03/2018" },
+    { n: "Prazo depurador superado", natAnt: "comum", natPost: "comum", status: "definitiva", fato: "12/01/2008", denuncia: "03/04/2008", transito: "18/11/2009", extincao: "18/11/2011", novo: "22/07/2018" },
+    { n: "Crime político", natAnt: "politico", natPost: "comum", status: "definitiva", fato: "10/03/2015", denuncia: "02/06/2015", transito: "20/08/2017", extincao: "20/08/2019", novo: "15/04/2022" },
+    { n: "Crime militar próprio", natAnt: "militar", natPost: "comum", status: "definitiva", fato: "10/03/2015", denuncia: "02/06/2015", transito: "20/08/2017", extincao: "20/08/2019", novo: "15/04/2022" },
+    { n: "Processo em andamento", natAnt: "comum", natPost: "comum", status: "andamento", fato: "08/06/2021", denuncia: "15/09/2021", transito: "", extincao: "", novo: "10/02/2023" }
+  ];
+
+  function readInputs() {
+    const x = { natAnt: (document.querySelector('input[name="rmNat"]:checked') || {}).value || "comum", natPost: $("rmPost").value, status: $("rmStatus").value,
+      pendente: $("rmPend").checked, benef: $("rmBen").value, revogado: $("rmRev").checked, modo: state.modo, invalid: [] };
+    Object.keys(IN).forEach(k => {
+      const elx = $(IN[k]), raw = elx.value.trim();
+      const v = raw ? parseBR(raw) : null;
+      x[k] = v;
+      const bad = raw && v == null;
+      elx.setAttribute("aria-invalid", bad ? "true" : "false");
+      if (bad && (k !== "benefData" || x.benef !== "nenhum") && !(x.status !== "definitiva" && (k === "transito" || k === "extincao"))) x.invalid.push(LABEL[k]);
+    });
+    if (x.status !== "definitiva") { x.transito = null; x.extincao = null; }
+    if (x.benef === "nenhum") x.benefData = null;
+    return x;
+  }
+
+  const PILL = { "SIM": "p-sim", "NÃO": "p-nao", "INDETERMINADO": "p-ind", "POSSÍVEIS": "p-pos", "NÃO CONFIGURADOS": "p-nao", "DEPENDE DE ANÁLISE": "p-ind" };
+  const svg = $("rmSvg"), scroll = $("rmScroll");
+  const TL = makeTimeline(svg, { interactive: true, width: () => scroll.clientWidth, zoom: () => state.zoom, minW: 640 });
+  let cur = null;
+
+  function renderPanel(x, R) {
+    $("rmR").textContent = R.reinc; $("rmR").className = "pill " + PILL[R.reinc];
+    $("rmA").textContent = R.ant; $("rmA").className = "pill " + PILL[R.ant];
+    const c = R.campos;
+    const rows = [["Natureza do crime anterior", c.nat], ["Natureza da infração posterior", c.post], ["Trânsito em julgado anterior ao novo fato", c.trans],
+      ["Período depurador aplicável", c.periodo], ["Situação da condenação anterior", c.cond], ["Data do novo crime", fmtBR(x.novo)]];
+    $("rmDl").innerHTML = rows.map(r => "<div><dt>" + r[0] + "</dt><dd>" + r[1] + "</dd></div>").join("");
+    $("rmFund").innerHTML = R.fund.map(p => '<p class="' + p.cls + '">' + p.t + "</p>").join("");
+    const li = r => '<li><span class="i ' + (r.v === true ? "ok" : r.v === false ? "no" : "na") + '">' + (r.v === true ? "✓" : r.v === false ? "✕" : "?") + "</span><span>" + r.t + "</span></li>";
+    $("rmReqR").innerHTML = R.reqR.map(li).join("");
+    $("rmReqA").innerHTML = R.reqA.map(li).join("");
+  }
+
+  function update(keep) {
+    const x = readInputs();
+    const R = analisar(x);
+    cur = { x, R };
+    TL.draw(x, R, keep);
+    renderPanel(x, R);
+  }
+
+  function setNovo(d, keep) {
+    $("rmNovoIn").value = fmtBR(d);
+    update(keep);
+  }
+
+  // Arrastar (mouse e toque) sobre a linha do tempo
+  let dragging = false;
+  function pxFromEvent(ev) { const r = svg.getBoundingClientRect(); return (ev.clientX - r.left) * (TL.st.W / r.width); }
+  function clampDay(d) { const lo = cur && cur.x.fato != null ? Math.max(TL.st.d0, cur.x.fato + 1) : TL.st.d0; return Math.round(Math.max(lo, Math.min(TL.st.d1, d))); }
+  svg.addEventListener("pointerdown", ev => {
+    if (ev.button !== 0 && ev.pointerType === "mouse") return;
+    dragging = true; svg.setPointerCapture(ev.pointerId); svg.classList.add("drag");
+    setNovo(clampDay(TL.D(pxFromEvent(ev))), true);
+    ev.preventDefault();
+  });
+  svg.addEventListener("pointermove", ev => { if (!dragging) return; setNovo(clampDay(TL.D(pxFromEvent(ev))), true); });
+  const endDrag = ev => { if (!dragging) return; dragging = false; svg.classList.remove("drag"); try { svg.releasePointerCapture(ev.pointerId); } catch (e) {} update(false); };
+  svg.addEventListener("pointerup", endDrag);
+  svg.addEventListener("pointercancel", endDrag);
+  TL.g.novo.addEventListener("keydown", ev => {
+    if (!cur || cur.x.novo == null) return;
+    let d = cur.x.novo;
+    const k = ev.key;
+    if (k === "ArrowRight" || k === "ArrowUp") d += ev.shiftKey ? 30 : 1;
+    else if (k === "ArrowLeft" || k === "ArrowDown") d -= ev.shiftKey ? 30 : 1;
+    else if (k === "PageUp") d = addYears(d, 1);
+    else if (k === "PageDown") d = addYears(d, -1);
+    else return;
+    ev.preventDefault();
+    setNovo(d, false);
+    TL.g.novo.focus();
+  });
+
+  // Máscara dd/mm/aaaa
+  Object.values(IN).forEach(id => {
+    $(id).addEventListener("input", e => {
+      const t = e.target, dg = t.value.replace(/\D/g, "").slice(0, 8);
+      let v = dg;
+      if (dg.length > 4) v = dg.slice(0, 2) + "/" + dg.slice(2, 4) + "/" + dg.slice(4);
+      else if (dg.length > 2) v = dg.slice(0, 2) + "/" + dg.slice(2);
+      if (t.value !== v) t.value = v;
+      update(false);
+    });
+  });
+  document.querySelectorAll('input[name="rmNat"]').forEach(r => r.addEventListener("change", () => update(false)));
+  ["rmPost", "rmStatus", "rmBen"].forEach(id => $(id).addEventListener("change", () => {
+    if (id === "rmBen") $("rmBenDL").textContent = $("rmBen").value === "sursis" ? "Audiência admonitória" : $("rmBen").value === "livramento" ? "Cerimônia do livramento" : "Início do período de prova";
+    update(false);
+  }));
+  ["rmPend", "rmRev"].forEach(id => $(id).addEventListener("change", () => update(false)));
+
+
+  function setZoom(z) { state.zoom = Math.max(1, Math.min(4, z)); $("rmZv").textContent = Math.round(state.zoom * 100) + "%"; update(true); }
+  $("rmZi").addEventListener("click", () => setZoom(state.zoom + .5));
+  $("rmZo").addEventListener("click", () => setZoom(state.zoom - .5));
+
+  function loadEx(e, k) {
+    document.querySelector('input[name="rmNat"][value="' + e.natAnt + '"]').checked = true;
+    $("rmPost").value = e.natPost; $("rmStatus").value = e.status;
+    $("rmFato").value = e.fato || ""; $("rmDen").value = e.denuncia || ""; $("rmTrans").value = e.transito || ""; $("rmExt").value = e.extincao || ""; $("rmNovoIn").value = e.novo || "";
+    $("rmPend").checked = !!e.pendente; $("rmBen").value = e.benef || "nenhum"; $("rmBenD").value = e.benefData || ""; $("rmRev").checked = !!e.revogado;
+    if (e.benef && e.benef !== "nenhum") $("rmAdv").open = true;
+    if (k !== undefined) { state.ex = k; document.querySelectorAll("#rmEx button").forEach((b, i) => b.setAttribute("aria-pressed", i === k)); }
+    else document.querySelectorAll("#rmEx button").forEach(b => b.setAttribute("aria-pressed", "false"));
+    state.zoom = 1; $("rmZv").textContent = "100%";
+    update(false);
+  }
+  $("rmEx").innerHTML = EXEMPLOS.map((e, i) => '<button type="button" aria-pressed="false" data-ex="' + i + '"><b>' + (i + 1) + "</b>" + e.n + "</button>").join("");
+  $("rmEx").addEventListener("click", ev => { const b = ev.target.closest("button"); if (b) loadEx(EXEMPLOS[+b.dataset.ex], +b.dataset.ex); });
+  $("rmRestore").addEventListener("click", () => loadEx(EXEMPLOS[state.ex], state.ex));
+  $("rmClear").addEventListener("click", () => {
+    loadEx({ natAnt: "comum", natPost: "comum", status: "definitiva", fato: "", denuncia: "", transito: "", extincao: "", novo: "" });
+  });
+  let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => update(true), 120); });
+
+  /* ---------- Teste seu conhecimento ---------- */
+  const QZ = [
+    { q: "A foi condenado por furto, com trânsito em julgado em 10/10/2019, e cumpriu a pena em 10/10/2020. Em 05/05/2023, praticou um roubo. Como deve ser valorada a condenação pelo furto na dosimetria do roubo?",
+      x: { natAnt: "comum", natPost: "comum", status: "definitiva", fato: "02/03/2018", denuncia: "20/04/2018", transito: "10/10/2019", extincao: "10/10/2020", novo: "05/05/2023" },
+      c: "Reincidência. O roubo é posterior ao trânsito em julgado e não decorreram mais de 5 anos desde o cumprimento da pena (10/10/2020 a 05/05/2023). A condenação entra na segunda fase (art. 61, I) e não pode ser usada também como maus antecedentes (Súm. 241)." },
+    { q: "B praticou um estelionato em 01/02/2019. Ele já respondia a outra ação penal, por fato de 2017, cuja condenação transitou em julgado em 30/06/2019. Na sentença do estelionato, como valorar essa condenação?",
+      x: { natAnt: "comum", natPost: "comum", status: "definitiva", fato: "14/08/2017", denuncia: "10/11/2017", transito: "30/06/2019", extincao: "30/06/2021", novo: "01/02/2019" },
+      c: "Maus antecedentes. O estelionato foi praticado antes do trânsito em julgado, logo não há reincidência. Mas o fato da outra condenação é anterior ao estelionato e a condenação é definitiva no momento da sentença: serve como antecedente (Masson; Greco)." },
+    { q: "C teve a pena por lesão corporal extinta em 03/03/2012 e praticou novo crime em 04/04/2019. Qual o efeito da condenação antiga?",
+      x: { natAnt: "comum", natPost: "comum", status: "definitiva", fato: "15/01/2010", denuncia: "01/03/2010", transito: "03/03/2011", extincao: "03/03/2012", novo: "04/04/2019" },
+      c: "Maus antecedentes. Entre a extinção (03/03/2012) e o novo crime transcorreram mais de 5 anos: a reincidência está depurada (art. 64, I). O período depurador, porém, não se aplica aos maus antecedentes (STF, Tema 150)." },
+    { q: "D, ex-militar, foi condenado definitivamente por deserção, crime militar próprio, com trânsito em 12/12/2018. Em 2021, já civil, cometeu um furto. Como fica a condenação por deserção?",
+      x: { natAnt: "militar", natPost: "comum", status: "definitiva", fato: "05/05/2017", denuncia: "01/08/2017", transito: "12/12/2018", extincao: "12/06/2019", novo: "20/09/2021" },
+      c: "Maus antecedentes, segundo Masson. Crimes militares próprios não geram reincidência (art. 64, II), mas a vedação se limita à reincidência, e a condenação pode configurar maus antecedentes, com fundamentação. O simulador marca o ponto como dependente de análise." },
+    { q: "E responde a uma ação penal por receptação, ainda sem sentença, por fato de 2021. Em 2023, praticou um furto. A ação em curso pode ser usada na dosimetria do furto?",
+      x: { natAnt: "comum", natPost: "comum", status: "andamento", fato: "08/06/2021", denuncia: "15/09/2021", transito: "", extincao: "", novo: "10/02/2023" },
+      c: "Nenhum dos dois. Sem trânsito em julgado não há reincidência, e ações penais em curso não podem agravar a pena-base (Súm. 444, STJ)." },
+    { q: "F teve a pena extinta em 12/05/2000 e praticou novo crime em 11/05/2005. A condenação anterior ainda gera reincidência?",
+      x: { natAnt: "comum", natPost: "comum", status: "definitiva", fato: "10/02/1997", denuncia: "20/04/1997", transito: "12/05/1998", extincao: "12/05/2000", novo: "11/05/2005" },
+      c: "Reincidência. Conta-se o primeiro dia e exclui-se o último (art. 10): o período depurador iniciado em 12/05/2000 vai até 11/05/2005, inclusive. O novo crime ocorreu no último dia do prazo e, portanto, ainda gera reincidência (art. 64, I)." }
+  ];
+  const ANS = { reinc: "Reincidência", ant: "Maus antecedentes", nenhum: "Nenhum dos dois" };
+  const qsvg = $("qzSvg");
+  const QTL = makeTimeline(qsvg, { interactive: false, width: () => Math.max(640, $("qzSvg").parentElement.clientWidth - 2), H: 270, axisY: 160 });
+  const qstate = { i: 0, done: {} };
+  function qInput(q) {
+    const x = { natAnt: q.x.natAnt, natPost: q.x.natPost, status: q.x.status, pendente: false, benef: "nenhum", revogado: false, modo: "juridico", invalid: [] };
+    ["fato", "denuncia", "transito", "extincao", "novo"].forEach(k => { x[k] = q.x[k] ? parseBR(q.x[k]) : null; });
+    x.benefData = null;
+    if (x.status !== "definitiva") { x.transito = null; x.extincao = null; }
+    return x;
+  }
+  function expected(R) { return R.reinc === "SIM" ? "reinc" : (R.ant === "POSSÍVEIS" || R.ant === "DEPENDE DE ANÁLISE") ? "ant" : "nenhum"; }
+  function showQ(i) {
+    qstate.i = i;
+    const q = QZ[i], x = qInput(q), R = analisar(x);
+    $("qzQ").innerHTML = "<b>Questão " + (i + 1) + ".</b> " + q.q;
+    const d = qstate.done[i];
+    // Antes da resposta, a linha do tempo mostra só os marcos, sem faixas nem destaques que revelem o resultado
+    QTL.draw(x, d ? R : Object.assign({}, R, { marks: {}, seg: null }), false);
+    document.querySelectorAll("#qzAns button").forEach(b => {
+      b.disabled = !!d; b.className = "";
+      if (d) { if (b.dataset.a === expected(R)) b.className = "right"; else if (b.dataset.a === d) b.className = "wrong"; }
+    });
+    renderFb(i, R);
+    renderNav();
+  }
+  function renderFb(i, R) {
+    const d = qstate.done[i], fb = $("qzFb");
+    if (!d) { fb.hidden = true; return; }
+    const ok = d === expected(R);
+    fb.innerHTML = "<b>" + (ok ? "Correto." : "Resposta esperada: " + ANS[expected(R)] + ".") + "</b><p>" + QZ[i].c + "</p><p style=\"color:var(--rm-beige)\">Simulador: reincidência " + R.reinc.toLowerCase() + " · maus antecedentes " + R.ant.toLowerCase() + ".</p>";
+    fb.hidden = false;
+  }
+  function renderNav() {
+    const right = Object.keys(qstate.done).filter(k => qstate.done[k] === expected(analisar(qInput(QZ[k])))).length;
+    $("qzNav").innerHTML = QZ.map((q, k) => {
+      const d = qstate.done[k];
+      const cls = d ? (d === expected(analisar(qInput(q))) ? "right" : "wrong") : "";
+      return '<button type="button" class="' + cls + '" data-q="' + k + '"' + (k === qstate.i ? ' aria-current="true"' : "") + ' aria-label="Questão ' + (k + 1) + '">' + (k + 1) + "</button>";
+    }).join("") + '<span class="qz-score">' + right + " de " + Object.keys(qstate.done).length + " acertos · " + QZ.length + " questões</span>";
+  }
+  $("qzNav").addEventListener("click", ev => { const b = ev.target.closest("button"); if (b) showQ(+b.dataset.q); });
+  $("qzAns").addEventListener("click", ev => {
+    const b = ev.target.closest("button"); if (!b || b.disabled) return;
+    qstate.done[qstate.i] = b.dataset.a; showQ(qstate.i);
+  });
+  $("qzNext").addEventListener("click", () => showQ((qstate.i + 1) % QZ.length));
+  $("qzLoad").addEventListener("click", () => {
+    const q = QZ[qstate.i];
+    loadEx(Object.assign({ benef: "nenhum" }, q.x));
+    $("rmSvg").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  /* ---------- Testes de validação (executáveis no console: __reinc.testes()) ---------- */
+  function caso(o) {
+    const x = Object.assign({ natAnt: "comum", natPost: "comum", status: "definitiva", pendente: false, benef: "nenhum", revogado: false, modo: "juridico", invalid: [] }, o);
+    ["fato", "denuncia", "transito", "extincao", "novo", "benefData"].forEach(k => { x[k] = o[k] ? parseBR(o[k]) : null; });
+    return analisar(x);
+  }
+  function testes() {
+    const base = { fato: "01/01/1995", denuncia: "01/03/1995", transito: "12/05/1998", extincao: "12/05/2000" };
+    const T = [];
+    const t = (nome, cond) => T.push((cond ? "OK   " : "FALHA ") + nome);
+    t("1. crime após o trânsito, dentro do prazo → reincidência", caso(Object.assign({}, base, { novo: "01/01/2002" })).reinc === "SIM");
+    t("2. crime antes do trânsito → sem reincidência", caso(Object.assign({}, base, { novo: "01/01/1998" })).reinc === "NÃO");
+    t("3. denúncia não substitui o trânsito (crime entre denúncia e trânsito)", caso(Object.assign({}, base, { novo: "01/06/1996" })).reinc === "NÃO");
+    const r4 = caso({ fato: "01/01/1995", transito: "12/05/1998", extincao: "12/05/2000", novo: "01/06/2004" });
+    t("4. prazo conta da extinção (12/05/2000), não do trânsito (12/05/1998): crime em 2004 → reincidência", r4.reinc === "SIM" && r4.marks.depStart === parseBR("12/05/2000"));
+    t("5. extinção em 12/05/2000 → período depurador até 11/05/2005", /até 11\/05\/2005/.test(r4.campos.periodo) && fmtBR(r4.marks.depEnd - 1) === "11/05/2005");
+    t("6. condenação depurada → maus antecedentes possíveis", caso(Object.assign({}, base, { novo: "01/01/2010" })).ant === "POSSÍVEIS");
+    t("7. reincidência → mesma condenação não gera antecedentes (Súm. 241)", caso(Object.assign({}, base, { novo: "01/01/2002" })).ant === "NÃO CONFIGURADOS");
+    const r8 = caso({ status: "andamento", fato: "01/01/2020", novo: "01/01/2022" });
+    t("8. processo em andamento → nem reincidência nem antecedentes", r8.reinc === "NÃO" && r8.ant === "NÃO CONFIGURADOS");
+    const r9a = caso({ fato: "01/01/2020", transito: "", novo: "01/01/2022" });
+    const r9b = Object.assign({ natAnt: "comum", natPost: "comum", status: "definitiva", benef: "nenhum", modo: "juridico", invalid: ["data do trânsito em julgado"] }, { fato: parseBR("01/01/2020"), transito: null, novo: parseBR("01/01/2022") });
+    const r9c = caso({ fato: "01/01/2020", transito: "01/01/2019", novo: "01/01/2022" });
+    const r9d = caso({ fato: "01/01/2015", transito: "01/01/2016", novo: "01/01/2022" });
+    t("9. dados faltantes, inválidos ou incoerentes → indeterminado", r9a.reinc === "INDETERMINADO" && analisar(r9b).reinc === "INDETERMINADO" && r9c.reinc === "INDETERMINADO" && r9d.reinc === "INDETERMINADO" && /extinção/.test(r9d.falta.join()));
+    const e0 = caso(Object.assign({}, base, { novo: "12/05/2000" })), e1 = caso(Object.assign({}, base, { novo: "11/05/2005" })), e2 = caso(Object.assign({}, base, { novo: "12/05/2005" })), e3 = caso(Object.assign({}, base, { novo: "13/05/2005" }));
+    t("Borda: 12/05/2000 SIM · 11/05/2005 (último dia) SIM · 12/05/2005 NÃO · 13/05/2005 NÃO", e0.reinc === "SIM" && e1.reinc === "SIM" && e2.reinc === "NÃO" && e3.reinc === "NÃO");
+    t("Crime no próprio dia do trânsito → sem reincidência", caso(Object.assign({}, base, { novo: "12/05/1998" })).reinc === "NÃO");
+    const s1 = caso({ fato: "01/01/2010", transito: "01/01/2012", extincao: "01/01/2016", benef: "sursis", benefData: "01/03/2012", novo: "01/06/2017" });
+    const s2 = caso({ fato: "01/01/2010", transito: "01/01/2012", extincao: "01/01/2016", benef: "sursis", benefData: "01/03/2012", revogado: true, novo: "01/06/2017" });
+    t("Sursis não revogado conta da audiência (2017: depurado); revogado conta da extinção (2017: reincidente)", s1.reinc === "NÃO" && s2.reinc === "SIM");
+    t("Crime político / militar próprio anterior → sem reincidência, antecedentes dependem de análise", caso(Object.assign({}, base, { natAnt: "politico", novo: "01/01/2002" })).reinc === "NÃO" && caso(Object.assign({}, base, { natAnt: "militar", novo: "01/01/2002" })).ant === "DEPENDE DE ANÁLISE");
+    t("Militar próprio seguido de militar próprio → indeterminado (CPM, art. 71)", caso(Object.assign({}, base, { natAnt: "militar", natPost: "militar", novo: "01/01/2002" })).reinc === "INDETERMINADO");
+    t("Novo crime anterior ao crime anterior → cronologia inválida", caso({ fato: "01/01/2022", transito: "01/01/2024", novo: "01/01/2020" }).reinc === "INDETERMINADO");
+    t("29/02/2000 + 5 anos → 01/03/2005", fmtBR(addYears(parseBR("29/02/2000"), 5)) === "01/03/2005");
+    t("Gabarito do quiz coerente com o motor", QZ.every((q, i) => expected(analisar(qInput(q))) === ["reinc", "ant", "ant", "ant", "nenhum", "reinc"][i]));
+    return T;
+  }
+  window.__reinc = { analisar, parseBR, fmtBR, addYears, testes, caso };
+
+  // Estado inicial
+  loadEx(EXEMPLOS[0], 0);
+  showQ(0);
+})();
+</script>
+
+<!-- GoatCounter: contador de visitas (sem cookies). Troque "dosimetria-ufsm" se registrar outro código. -->
+<script data-goatcounter="https://dosimetria-ufsm.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
