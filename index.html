@@ -1,0 +1,658 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Dosimetria da Pena</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Hanken+Grotesk:wght@400;500;600&display=swap">
+<style>
+/* Layout: faixa de abertura em azul-meia-noite com filetes dourados e as três fases do art. 68; abaixo, formulário em porcelana à esquerda e cartão de resultado escuro, fixo, à direita. */
+:root {
+  --paper: #F5F3EE;
+  --surface: #FDFCFA;
+  --ink: #131A25;
+  --muted: #626875;
+  --line: #E2DDD2;
+  --gold: #B08F55;
+  --gold-ink: #86672F;
+  --gold-soft: #F4EDDF;
+  --night: #0D1524;
+  --night-2: #152036;
+  --on-night: #EEE7D7;
+  --on-night-muted: #A3A8B2;
+  --night-line: #2A3650;
+  --night-gold: #D6BA87;
+  --glow: rgba(214, 186, 135, .16);
+  --warn: #8C4A1E;
+  --warn-soft: #F7E9DE;
+  --track: #2A3650;
+  --f-display: "Cormorant Garamond", "Cormorant", Garamond, "Times New Roman", serif;
+  --f-body: "Hanken Grotesk", "Helvetica Neue", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0A101B; --surface: #111927; --ink: #ECE6D9; --muted: #9EA3AD; --line: #252F41;
+    --gold: #CDAE78; --gold-ink: #D9BE8C; --gold-soft: #211F1A;
+    --night: #060B14; --night-2: #0F1828; --on-night: #EEE7D7; --on-night-muted: #A3A8B2; --night-line: #26324A; --night-gold: #D6BA87;
+    --glow: rgba(214, 186, 135, .12); --warn: #E3A273; --warn-soft: #2A1D15; --track: #26324A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0A101B; --surface: #111927; --ink: #ECE6D9; --muted: #9EA3AD; --line: #252F41;
+  --gold: #CDAE78; --gold-ink: #D9BE8C; --gold-soft: #211F1A;
+  --night: #060B14; --night-2: #0F1828; --on-night: #EEE7D7; --on-night-muted: #A3A8B2; --night-line: #26324A; --night-gold: #D6BA87;
+  --glow: rgba(214, 186, 135, .12); --warn: #E3A273; --warn-soft: #2A1D15; --track: #26324A;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--f-body); font-size: 15px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.in {
+  max-width: 1200px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.eyebrow { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; font-weight: 500; color: var(--gold-ink); }
+
+/* ---------- Abertura ---------- */
+.hero {
+  background:
+    radial-gradient(ellipse 70% 120% at 88% -20%, var(--glow), transparent 60%),
+    var(--night);
+  color: var(--on-night);
+  border-bottom: 1px solid var(--night-gold);
+  box-shadow: 0 4px 0 -3px var(--night-gold);
+}
+.hero .in { padding-block: 56px 0; display: grid; gap: 18px; }
+.hero .eyebrow { color: var(--night-gold); display: flex; align-items: center; gap: 14px; }
+.hero .eyebrow::before { content: ""; width: 36px; height: 1px; background: var(--night-gold); }
+h1 {
+  font-family: var(--f-display); font-weight: 500; margin: 0;
+  font-size: clamp(46px, 7.4vw, 92px); line-height: .95; letter-spacing: -.015em; text-wrap: balance;
+}
+h1 em { font-style: italic; color: var(--night-gold); font-weight: 500; }
+.lede { margin: 0; color: var(--on-night-muted); max-width: 62ch; font-size: 16px; }
+
+.phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 26px; border-top: 1px solid var(--night-line); }
+.phase { padding: 18px 22px 22px 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; align-items: baseline; min-width: 0; position: relative; }
+.phase + .phase { padding-left: 22px; border-left: 1px solid var(--night-line); }
+.phase .n { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--on-night-muted); grid-row: span 2; font-weight: 500; }
+.phase .t { font-family: var(--f-display); font-size: 21px; font-weight: 600; line-height: 1.15; }
+.phase .s { font-size: 12.5px; color: var(--on-night-muted); grid-column: 2; }
+.phase.on::before { content: ""; position: absolute; top: -1px; left: 0; right: 22px; height: 2px; background: var(--night-gold); }
+.phase + .phase.on::before { left: 22px; }
+.phase.on .n { color: var(--night-gold); font-style: italic; }
+.phase.off { opacity: .62; }
+.phase.off .t { font-weight: 500; }
+
+/* ---------- Corpo ---------- */
+main.in { padding-block: 52px 24px; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 48px; align-items: start; }
+.col { display: grid; gap: 44px; min-width: 0; }
+
+section.block { display: grid; gap: 18px; }
+.block-h { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid var(--line); position: relative; }
+.block-h::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 56px; height: 1px; background: var(--gold); }
+.block-h .ttl { display: grid; gap: 2px; }
+h2 { font-family: var(--f-display); font-weight: 600; font-size: 30px; line-height: 1.05; margin: 0; letter-spacing: -.005em; }
+h2 em { font-style: italic; font-weight: 500; color: var(--muted); font-size: .72em; margin-left: 8px; }
+.hint { font-size: 13.5px; color: var(--muted); margin: 0; max-width: 70ch; }
+
+label.fld { display: grid; gap: 8px; }
+.lbl { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 500; color: var(--muted); }
+select, input[type="number"], input[type="text"] {
+  font: inherit; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 2px; padding: 11px 13px; width: 100%; min-width: 0;
+  transition: border-color .15s;
+}
+select {
+  appearance: none; -webkit-appearance: none; padding-right: 38px; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--gold) 50%), linear-gradient(135deg, var(--gold) 50%, transparent 50%);
+  background-position: calc(100% - 19px) 52%, calc(100% - 14px) 52%;
+  background-size: 5px 5px, 5px 5px; background-repeat: no-repeat;
+}
+select:hover, input:hover { border-color: var(--gold); }
+select:focus-visible, input:focus-visible, button:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; border-color: var(--gold); }
+.row2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; }
+.limits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.limit { display: grid; gap: 8px; min-width: 0; }
+.triple { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.unit { position: relative; }
+.unit input { padding-right: 38px; font-variant-numeric: tabular-nums lining-nums; font-weight: 500; }
+.unit span { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); font-size: 11px; letter-spacing: .06em; color: var(--muted); pointer-events: none; }
+.cite { font-size: 13.5px; color: var(--muted); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.cite b { font-family: var(--f-display); font-size: 17px; font-weight: 600; color: var(--gold-ink); font-style: italic; }
+.err { color: var(--warn); background: var(--warn-soft); border-left: 2px solid var(--warn); padding: 10px 14px; font-size: 13.5px; }
+
+/* Circunstâncias */
+.circs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.circ { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); padding: 16px 18px; display: grid; gap: 8px; min-width: 0; transition: background .2s; position: relative; }
+.circ.on { background: var(--gold-soft); }
+.circ.on::before { content: ""; position: absolute; left: -1px; top: -1px; bottom: -1px; width: 2px; background: var(--gold); }
+.circ label.head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; cursor: pointer; }
+.circ input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin: 4px 0 0; border: 1px solid var(--gold); border-radius: 2px; background: var(--surface); cursor: pointer; display: grid; place-items: center; transition: background .15s;
+}
+.circ input[type="checkbox"]::after { content: ""; width: 5px; height: 10px; border: solid var(--surface); border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px); opacity: 0; }
+.circ input[type="checkbox"]:checked { background: var(--gold); }
+.circ input[type="checkbox"]:checked::after { opacity: 1; }
+.circ .ct { font-family: var(--f-display); font-weight: 600; font-size: 20px; line-height: 1.15; display: flex; gap: 10px; align-items: baseline; }
+.circ .ord { font-style: italic; font-weight: 500; color: var(--gold-ink); font-size: 18px; min-width: 22px; }
+.circ .cd { font-size: 13px; color: var(--muted); line-height: 1.5; display: block; margin-top: 4px; }
+.circ .tag { display: none; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-ink); font-weight: 600; }
+.circ.on .tag { display: block; }
+.circ .note { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; line-height: 1.5; }
+.circ .warn { font-size: 12.5px; color: var(--warn); background: var(--warn-soft); border-left: 2px solid var(--warn); padding: 7px 10px; line-height: 1.5; }
+.circ input[type="text"] { font-size: 13.5px; padding: 8px 10px; }
+.count { font-size: 13px; color: var(--muted); letter-spacing: .02em; }
+.count b { font-family: var(--f-display); font-size: 22px; font-weight: 600; color: var(--gold-ink); margin-right: 3px; }
+.btn { font: inherit; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 2px; padding: 9px 14px; cursor: pointer; transition: border-color .15s, color .15s, background .15s; }
+.btn:hover { border-color: var(--gold); color: var(--gold-ink); }
+.tools { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+
+/* Critério */
+.crits { display: grid; gap: 0; border: 1px solid var(--line); }
+.crit { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: start; background: var(--surface); padding: 15px 18px; cursor: pointer; position: relative; transition: background .2s; }
+.crit + .crit { border-top: 1px solid var(--line); }
+.crit:has(input:checked) { background: var(--gold-soft); }
+.crit:has(input:checked)::before { content: ""; position: absolute; left: -1px; top: 0; bottom: 0; width: 2px; background: var(--gold); }
+.crit input { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 1px solid var(--gold); border-radius: 50%; margin: 5px 0 0; display: grid; place-items: center; cursor: pointer; background: var(--surface); }
+.crit input::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); transform: scale(0); transition: transform .15s; }
+.crit input:checked::after { transform: scale(1); }
+.crit .t { font-family: var(--f-display); font-weight: 600; font-size: 19px; line-height: 1.2; }
+.crit .t em { font-family: var(--f-body); font-style: normal; font-weight: 600; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-ink); margin-left: 10px; vertical-align: 3px; }
+.crit .d { font-size: 13px; color: var(--muted); display: block; margin-top: 3px; }
+
+.notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 32px; padding-top: 4px; }
+.notes p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.55; }
+.notes b { display: block; font-family: var(--f-display); font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+
+/* ---------- Resultado ---------- */
+aside.res {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px);
+  background: radial-gradient(ellipse 90% 60% at 100% 0%, var(--glow), transparent 70%), var(--night);
+  color: var(--on-night); border: 1px solid var(--night-gold); min-width: 0;
+  box-shadow: 0 24px 48px -28px rgba(6, 11, 20, .55);
+}
+aside.res::before { content: ""; position: absolute; inset: 6px; border: 1px solid var(--night-line); pointer-events: none; }
+.res > div { position: relative; }
+.res-h { padding: 30px 30px 24px; display: grid; gap: 10px; text-align: center; }
+.res-h .eyebrow { color: var(--night-gold); }
+.pb { font-family: var(--f-display); font-weight: 500; font-size: 46px; line-height: 1.02; letter-spacing: -.01em; text-wrap: balance; color: var(--on-night); font-variant-numeric: lining-nums; }
+.pb-esp { font-family: var(--f-display); font-style: italic; font-size: 20px; color: var(--night-gold); }
+.pb-sub { font-size: 12.5px; color: var(--on-night-muted); letter-spacing: .02em; }
+.pb-sub b { color: var(--on-night); font-weight: 600; }
+.orn { display: flex; align-items: center; gap: 12px; color: var(--night-gold); margin: 2px auto 0; width: 70%; }
+.orn::before, .orn::after { content: ""; flex: 1; height: 1px; background: var(--night-line); }
+.orn span { width: 5px; height: 5px; background: var(--night-gold); transform: rotate(45deg); }
+
+.ruler { padding: 4px 30px 18px; }
+.track { position: relative; height: 34px; margin: 26px 2px 30px; }
+.bar { position: absolute; left: 0; right: 0; top: 16px; height: 2px; background: var(--track); }
+.zone { position: absolute; top: 12px; height: 10px; border: 1px solid var(--night-gold); border-top: 0; opacity: .55; }
+.fill { position: absolute; top: 16px; height: 2px; left: 0; background: var(--night-gold); transition: width .3s ease; }
+.tick { position: absolute; top: 12px; width: 1px; height: 10px; background: var(--night-gold); opacity: .6; }
+.mark { position: absolute; top: 11px; width: 12px; height: 12px; margin-left: -6px; transition: left .3s ease; }
+.mark::before { content: ""; position: absolute; inset: 0; background: var(--night-gold); transform: rotate(45deg); box-shadow: 0 0 0 4px var(--night); }
+.mark::after { content: attr(data-l); position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; font-weight: 600; color: var(--on-night); letter-spacing: .04em; }
+.lab { position: absolute; top: 28px; font-size: 10.5px; color: var(--on-night-muted); white-space: nowrap; transform: translateX(-50%); letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+.lab.l { transform: none; }
+.lab.r { transform: translateX(-100%); }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; font-size: 11px; color: var(--on-night-muted); letter-spacing: .04em; }
+.legend i { display: inline-block; width: 14px; height: 2px; margin-right: 7px; vertical-align: middle; background: var(--night-gold); }
+.legend i.z { height: 7px; background: transparent; border: 1px solid var(--night-gold); border-top: 0; opacity: .7; }
+
+.memo, .minuta { padding: 22px 30px; border-top: 1px solid var(--night-line); }
+.res h3 { font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--night-gold); font-weight: 600; margin: 0 0 14px; }
+.memo ol { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 12px; }
+.memo li { counter-increment: s; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; font-size: 13.5px; }
+.memo li::before { content: counter(s, upper-roman) "."; font-family: var(--f-display); font-style: italic; font-size: 16px; color: var(--night-gold); line-height: 1.25; }
+.memo .k { color: var(--on-night-muted); display: block; font-size: 12px; letter-spacing: .02em; }
+.memo .v { font-variant-numeric: tabular-nums lining-nums; overflow-wrap: anywhere; color: var(--on-night); }
+.memo .v b { font-weight: 600; color: var(--night-gold); }
+.memo .fx { font-size: 12px; color: var(--night-gold); margin-top: 14px; font-style: italic; }
+
+.minuta { display: grid; gap: 14px; padding-bottom: 28px; }
+.minuta-t { font-family: var(--f-display); font-size: 17.5px; line-height: 1.55; color: var(--on-night); background: var(--night-2); border-left: 2px solid var(--night-gold); padding: 16px 18px; text-align: left; hyphens: auto; }
+.minuta-f { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.btn.gold { background: var(--night-gold); border-color: var(--night-gold); color: var(--night); }
+.btn.gold:hover { background: transparent; color: var(--night-gold); }
+.ok { font-size: 12px; color: var(--night-gold); font-style: italic; }
+
+footer.in { padding-block: 28px 56px; }
+footer p { margin: 0; font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; max-width: 92ch; }
+
+@media (max-width: 980px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  aside.res { position: relative; top: 0; }
+}
+@media (max-width: 680px) {
+  .hero .in { padding-block: 40px 0; }
+  .circs, .limits, .row2, .notes { grid-template-columns: minmax(0, 1fr); }
+  .phases { grid-template-columns: minmax(0, 1fr); }
+  .phase, .phase + .phase { padding: 14px 0; border-left: 0; }
+  .phase + .phase { border-top: 1px solid var(--night-line); }
+  .phase.on::before, .phase + .phase.on::before { left: 0; right: 0; }
+  .res-h, .ruler, .memo, .minuta { padding-left: 22px; padding-right: 22px; }
+  .pb { font-size: 38px; }
+  h2 { font-size: 26px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="hero">
+  <div class="in">
+    <div class="eyebrow">Critério trifásico · Art. 68 do Código Penal</div>
+    <h1>Dosimetria <em>da</em> Pena</h1>
+    <p class="lede">Primeira fase: a pena-base, fixada a partir dos limites em abstrato do tipo penal e das oito circunstâncias judiciais do art. 59, pelo critério do termo médio.</p>
+    <nav class="phases" aria-label="Fases da dosimetria">
+      <div class="phase on"><span class="n">I</span><span class="t">Pena-base</span><span class="s">Circunstâncias judiciais, art. 59</span></div>
+      <div class="phase off"><span class="n">II</span><span class="t">Pena provisória</span><span class="s">Agravantes e atenuantes · próxima etapa</span></div>
+      <div class="phase off"><span class="n">III</span><span class="t">Pena definitiva</span><span class="s">Causas de aumento e diminuição · próxima etapa</span></div>
+    </nav>
+  </div>
+</header>
+
+<main class="in">
+  <div class="grid">
+    <div class="col">
+
+      <section class="block" aria-labelledby="h-tipo">
+        <div class="block-h"><div class="ttl"><span class="eyebrow">Limites em abstrato</span><h2 id="h-tipo">Tipo penal</h2></div></div>
+        <div class="row2">
+          <label class="fld"><span class="lbl">Crime</span>
+            <select id="crime"></select>
+          </label>
+          <label class="fld"><span class="lbl">Espécie de pena</span>
+            <select id="especie">
+              <option value="reclusão">Reclusão</option>
+              <option value="detenção">Detenção</option>
+            </select>
+          </label>
+        </div>
+        <div class="limits">
+          <div class="limit">
+            <span class="lbl">Pena mínima</span>
+            <div class="triple">
+              <div class="unit"><input id="minA" type="number" min="0" step="1" inputmode="numeric" aria-label="Pena mínima, anos"><span>anos</span></div>
+              <div class="unit"><input id="minM" type="number" min="0" step="1" inputmode="numeric" aria-label="Pena mínima, meses"><span>m</span></div>
+              <div class="unit"><input id="minD" type="number" min="0" step="1" inputmode="numeric" aria-label="Pena mínima, dias"><span>d</span></div>
+            </div>
+          </div>
+          <div class="limit">
+            <span class="lbl">Pena máxima</span>
+            <div class="triple">
+              <div class="unit"><input id="maxA" type="number" min="0" step="1" inputmode="numeric" aria-label="Pena máxima, anos"><span>anos</span></div>
+              <div class="unit"><input id="maxM" type="number" min="0" step="1" inputmode="numeric" aria-label="Pena máxima, meses"><span>m</span></div>
+              <div class="unit"><input id="maxD" type="number" min="0" step="1" inputmode="numeric" aria-label="Pena máxima, dias"><span>d</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="cite" id="cite"></div>
+        <div class="err" id="err" hidden></div>
+      </section>
+
+      <section class="block" aria-labelledby="h-circ">
+        <div class="block-h">
+          <div class="ttl"><span class="eyebrow">Art. 59 do Código Penal</span><h2 id="h-circ">Circunstâncias judiciais</h2></div>
+          <div class="tools"><span class="count" id="count"></span><button class="btn" id="clear" type="button">Desmarcar todas</button></div>
+        </div>
+        <p class="hint">Marque as circunstâncias valoradas negativamente; as demais são tidas como neutras ou favoráveis. O fundamento concreto é opcional e passa a integrar a minuta.</p>
+        <div class="circs" id="circs"></div>
+      </section>
+
+      <section class="block" aria-labelledby="h-crit">
+        <div class="block-h"><div class="ttl"><span class="eyebrow">Fração por circunstância</span><h2 id="h-crit">Critério de exasperação</h2></div></div>
+        <div class="crits" id="crits">
+          <label class="crit"><input type="radio" name="crit" id="critA" value="A" checked>
+            <span><span class="t">Termo médio <em>Padrão do material</em></span><span class="d">Cada circunstância vale 1/8 do intervalo entre a pena mínima e o termo médio. Com as oito desfavoráveis, a pena-base atinge o termo médio.</span></span></label>
+          <label class="crit"><input type="radio" name="crit" id="critB" value="B">
+            <span><span class="t">Um oitavo do intervalo total</span><span class="d">Cada circunstância vale 1/8 da diferença entre a pena máxima e a mínima. Fração frequentemente admitida pelo STJ; com as oito desfavoráveis, alcança o máximo.</span></span></label>
+          <label class="crit"><input type="radio" name="crit" id="critC" value="C">
+            <span><span class="t">Um sexto da pena mínima</span><span class="d">Cada circunstância eleva a pena em 1/6 do mínimo cominado, limitada ao máximo. Fração também admitida pelo STJ.</span></span></label>
+        </div>
+      </section>
+
+      <div class="notes">
+        <p><b>Qualificadora primeiro</b>Antes da dosimetria, verifique se há qualificadora, pois ela altera os próprios limites da pena (homicídio simples, 6 a 20 anos; qualificado, 12 a 30 anos).</p>
+        <p><b>Limites da primeira fase</b>A pena-base parte do mínimo cominado e não pode ultrapassar os limites em abstrato. Fixada no mínimo, tolera-se fundamentação sucinta.</p>
+        <p><b>Contagem</b>Adota-se 1 ano = 12 meses e 1 mês = 30 dias. Frações de dia são desprezadas (art. 11, CP).</p>
+        <p><b>Lei no tempo</b>O catálogo segue a redação vigente; para fatos anteriores às Leis 15.280/2025 e 15.397/2026, use a opção “redação anterior”, pois a lei mais grave não retroage (art. 5º, XL, CF).</p>
+      </div>
+
+    </div>
+
+    <aside class="res" aria-live="polite">
+      <div class="res-h">
+        <span class="eyebrow">Pena-base fixada</span>
+        <div class="pb" id="pb">—</div>
+        <div class="pb-esp" id="pbesp"></div>
+        <div class="orn" aria-hidden="true"><span></span></div>
+        <div class="pb-sub" id="pbsub"></div>
+      </div>
+      <div class="ruler">
+        <div class="track" id="track"></div>
+        <div class="legend"><span><i></i>Exasperação aplicada</span><span><i class="z"></i>Faixa da primeira fase</span></div>
+      </div>
+      <div class="memo">
+        <h3>Memória de cálculo</h3>
+        <ol id="memo"></ol>
+        <div class="fx" id="fx" hidden></div>
+      </div>
+      <div class="minuta">
+        <h3>Minuta de fundamentação</h3>
+        <div class="minuta-t" id="minuta"></div>
+        <div class="minuta-f"><button class="btn gold" id="copy" type="button">Copiar texto</button><span class="ok" id="copied" hidden>Texto copiado</span></div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer class="in"><p>Ferramenta de apoio ao estudo da dosimetria. Os limites em abstrato devem ser conferidos na redação do Código Penal vigente na data do fato, e a escolha da fração de exasperação é ato fundamentado do julgador, sem direito subjetivo do réu a critério matemático específico.</p></footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Catálogo de tipos penais (Código Penal) ----------
+  const L1539 = "Lei 15.397/2026";
+  const CAT = [
+    { g: "Crimes contra a pessoa", i: [
+      ["121", "Art. 121, caput", "Homicídio simples", "reclusão", [6,0,0], [20,0,0]],
+      ["121q", "Art. 121, § 2º", "Homicídio qualificado", "reclusão", [12,0,0], [30,0,0]],
+      ["121c", "Art. 121, § 3º", "Homicídio culposo", "detenção", [1,0,0], [3,0,0]],
+      ["121A", "Art. 121-A", "Feminicídio (Lei 14.994/2024)", "reclusão", [20,0,0], [40,0,0]],
+      ["129", "Art. 129, caput", "Lesão corporal", "detenção", [0,3,0], [1,0,0]],
+      ["129g", "Art. 129, § 1º", "Lesão corporal grave", "reclusão", [1,0,0], [5,0,0]],
+      ["129gg", "Art. 129, § 2º", "Lesão corporal gravíssima", "reclusão", [2,0,0], [8,0,0]],
+      ["129m", "Art. 129, § 3º", "Lesão corporal seguida de morte", "reclusão", [4,0,0], [12,0,0]],
+      ["147", "Art. 147, caput", "Ameaça (ou multa, alternativamente)", "detenção", [0,1,0], [0,6,0]],
+      ["148", "Art. 148, caput", "Sequestro e cárcere privado", "reclusão", [1,0,0], [3,0,0]]
+    ]},
+    { g: "Crimes contra o patrimônio", i: [
+      ["155", "Art. 155, caput", "Furto simples (" + L1539 + ")", "reclusão", [1,0,0], [6,0,0]],
+      ["155ant", "Art. 155, caput", "Furto simples, redação anterior (fatos até 03/05/2026)", "reclusão", [1,0,0], [4,0,0]],
+      ["155q", "Art. 155, § 4º", "Furto qualificado", "reclusão", [2,0,0], [8,0,0]],
+      ["157", "Art. 157, caput", "Roubo (" + L1539 + ")", "reclusão", [6,0,0], [10,0,0]],
+      ["157ant", "Art. 157, caput", "Roubo, redação anterior (fatos até 03/05/2026)", "reclusão", [4,0,0], [10,0,0]],
+      ["157lg", "Art. 157, § 3º, I", "Roubo com lesão corporal grave", "reclusão", [7,0,0], [18,0,0]],
+      ["157m", "Art. 157, § 3º, II", "Latrocínio (" + L1539 + ")", "reclusão", [24,0,0], [30,0,0]],
+      ["157mant", "Art. 157, § 3º, II", "Latrocínio, redação anterior (fatos até 03/05/2026)", "reclusão", [20,0,0], [30,0,0]],
+      ["158", "Art. 158, caput", "Extorsão", "reclusão", [4,0,0], [10,0,0]],
+      ["159", "Art. 159, caput", "Extorsão mediante sequestro", "reclusão", [8,0,0], [15,0,0]],
+      ["168", "Art. 168, caput", "Apropriação indébita", "reclusão", [1,0,0], [4,0,0]],
+      ["171", "Art. 171, caput", "Estelionato", "reclusão", [1,0,0], [5,0,0]],
+      ["171e", "Art. 171, § 2º-A", "Fraude eletrônica", "reclusão", [4,0,0], [8,0,0]],
+      ["180", "Art. 180, caput", "Receptação (" + L1539 + ")", "reclusão", [2,0,0], [6,0,0]],
+      ["180ant", "Art. 180, caput", "Receptação, redação anterior (fatos até 03/05/2026)", "reclusão", [1,0,0], [4,0,0]]
+    ]},
+    { g: "Crimes contra a dignidade sexual", i: [
+      ["213", "Art. 213, caput", "Estupro", "reclusão", [6,0,0], [10,0,0]],
+      ["217A", "Art. 217-A, caput", "Estupro de vulnerável (Lei 15.280/2025)", "reclusão", [10,0,0], [18,0,0]],
+      ["217Aant", "Art. 217-A, caput", "Estupro de vulnerável, redação anterior à Lei 15.280/2025", "reclusão", [8,0,0], [15,0,0]]
+    ]},
+    { g: "Paz pública e fé pública", i: [
+      ["288", "Art. 288, caput", "Associação criminosa", "reclusão", [1,0,0], [3,0,0]],
+      ["297", "Art. 297, caput", "Falsificação de documento público", "reclusão", [2,0,0], [6,0,0]],
+      ["298", "Art. 298, caput", "Falsificação de documento particular", "reclusão", [1,0,0], [5,0,0]],
+      ["299", "Art. 299, caput", "Falsidade ideológica (documento público)", "reclusão", [1,0,0], [5,0,0]]
+    ]},
+    { g: "Crimes contra a Administração Pública", i: [
+      ["312", "Art. 312, caput", "Peculato", "reclusão", [2,0,0], [12,0,0]],
+      ["316", "Art. 316, caput", "Concussão", "reclusão", [2,0,0], [12,0,0]],
+      ["317", "Art. 317, caput", "Corrupção passiva", "reclusão", [2,0,0], [12,0,0]],
+      ["329", "Art. 329, caput", "Resistência", "detenção", [0,2,0], [2,0,0]],
+      ["330", "Art. 330", "Desobediência", "detenção", [0,0,15], [0,6,0]],
+      ["331", "Art. 331", "Desacato", "detenção", [0,6,0], [2,0,0]],
+      ["332", "Art. 332, caput", "Tráfico de influência", "reclusão", [2,0,0], [5,0,0]],
+      ["333", "Art. 333, caput", "Corrupção ativa", "reclusão", [2,0,0], [12,0,0]]
+    ]}
+  ];
+  const BY = {};
+  CAT.forEach(g => g.i.forEach(c => { BY[c[0]] = { id: c[0], art: c[1], nome: c[2], esp: c[3], min: c[4], max: c[5] }; }));
+
+  // ---------- Circunstâncias do art. 59 ----------
+  const CIRCS = [
+    { id: "culp", t: "Culpabilidade", m: "a culpabilidade",
+      d: "Maior ou menor reprovabilidade da conduta, conforme a intensidade do dolo ou da culpa. Não se confunde com a culpabilidade como elemento do crime." },
+    { id: "ant", t: "Antecedentes", m: "os antecedentes",
+      d: "Vida pregressa do réu.",
+      n: "Somente condenação definitiva que não gere reincidência. Inquéritos e ações em curso não servem (Súm. 444, STJ); a mesma condenação não agrava duas vezes (Súm. 241, STJ)." },
+    { id: "soc", t: "Conduta social", m: "a conduta social",
+      d: "Comportamento do agente na comunidade, no trabalho e na família." },
+    { id: "pers", t: "Personalidade do agente", m: "a personalidade do agente",
+      d: "Índole, qualidades morais, agressividade e caráter do agente." },
+    { id: "mot", t: "Motivos do crime", m: "os motivos do crime",
+      d: "Razões que levaram ao delito: ódio, ambição, cobiça, amor à família etc.",
+      n: "Não valorar o motivo que já configure qualificadora, agravante, atenuante ou causa de aumento ou diminuição, sob pena de bis in idem." },
+    { id: "circ", t: "Circunstâncias do crime", m: "as circunstâncias do crime",
+      d: "Modo de execução, objeto, lugar, tempo, duração e relações que envolvem o delito." },
+    { id: "cons", t: "Consequências do crime", m: "as consequências do crime",
+      d: "Danosidade da ação além do resultado típico: trauma da vítima, desamparo de dependentes etc." },
+    { id: "vit", t: "Comportamento da vítima", m: "o comportamento da vítima",
+      d: "Provocação ou estímulo da vítima à conduta criminosa.",
+      w: "Segundo a jurisprudência do STJ, o comportamento da vítima é circunstância neutra ou favorável ao réu e não autoriza a elevação da pena-base." }
+  ];
+
+  // ---------- Utilitários de tempo (1 ano = 12 meses; 1 mês = 30 dias) ----------
+  const toD = (a, m, d) => a * 360 + m * 30 + d;
+  const num = (x, dec) => {
+    const r = Math.round(x * Math.pow(10, dec)) / Math.pow(10, dec);
+    return String(r).replace(".", ",");
+  };
+  function dur(days) {
+    days = Math.round(days * 1000) / 1000;
+    const a = Math.floor(days / 360 + 1e-9);
+    let r = days - a * 360;
+    const m = Math.floor(r / 30 + 1e-9);
+    const d = Math.round((r - m * 30) * 100) / 100;
+    const p = [];
+    if (a) p.push(a + (a === 1 ? " ano" : " anos"));
+    if (m) p.push(m + (m === 1 ? " mês" : " meses"));
+    if (d) p.push(num(d, 2) + (d === 1 ? " dia" : " dias"));
+    if (!p.length) return "0 dia";
+    return p.length === 1 ? p[0] : p.slice(0, -1).join(", ") + " e " + p[p.length - 1];
+  }
+  const meses = days => num(days / 30, 3) + (Math.abs(days / 30 - 1) < 1e-9 ? " mês" : " meses");
+  const short = days => {
+    const a = Math.floor(days / 360 + 1e-9), r = days - a * 360, m = Math.floor(r / 30 + 1e-9), d = Math.round(r - m * 30);
+    let s = "";
+    if (a) s += a + "a";
+    if (m) s += (s ? " " : "") + m + "m";
+    if (d) s += (s ? " " : "") + d + "d";
+    return s || "0";
+  };
+
+  const UN = ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove","dez","onze","doze","treze","quatorze","quinze","dezesseis","dezessete","dezoito","dezenove"];
+  const DZ = ["","","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"];
+  function ext(n) {
+    if (n < 20) return UN[n];
+    if (n < 100) { const d = Math.floor(n / 10), u = n % 10; return DZ[d] + (u ? " e " + UN[u] : ""); }
+    return String(n);
+  }
+  function durExt(days) {
+    const a = Math.floor(days / 360), r = days - a * 360, m = Math.floor(r / 30), d = r - m * 30;
+    const p = [];
+    if (a) p.push(a + " (" + ext(a) + ") " + (a === 1 ? "ano" : "anos"));
+    if (m) p.push(m + " (" + ext(m) + ") " + (m === 1 ? "mês" : "meses"));
+    if (d) p.push(d + " (" + ext(d) + ") " + (d === 1 ? "dia" : "dias"));
+    return p.length <= 1 ? (p[0] || "0 (zero) dia") : p.slice(0, -1).join(", ") + " e " + p[p.length - 1];
+  }
+  const joinE = arr => arr.length <= 1 ? (arr[0] || "") : arr.slice(0, -1).join(", ") + " e " + arr[arr.length - 1];
+  const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  // ---------- Montagem da interface ----------
+  const $ = id => document.getElementById(id);
+  const sel = $("crime");
+  sel.insertAdjacentHTML("beforeend", '<option value="custom">Personalizado (informar limites)</option>');
+  CAT.forEach(g => {
+    const og = document.createElement("optgroup");
+    og.label = g.g;
+    g.i.forEach(c => { const o = document.createElement("option"); o.value = c[0]; o.textContent = c[1] + " · " + c[2]; og.appendChild(o); });
+    sel.appendChild(og);
+  });
+
+  const box = $("circs");
+  CIRCS.forEach((c, k) => {
+    const el = document.createElement("div");
+    el.className = "circ";
+    el.id = "box-" + c.id;
+    el.innerHTML =
+      '<label class="head"><span><span class="tag">Desfavorável</span><span class="ct"><span class="ord">' + (k + 1) + 'º</span>' + c.t + '</span>' +
+      '<span class="cd">' + c.d + '</span></span><input type="checkbox" id="c-' + c.id + '"></label>' +
+      (c.n ? '<div class="note">' + c.n + '</div>' : "") +
+      (c.w ? '<div class="warn" id="w-' + c.id + '" hidden>' + c.w + '</div>' : "") +
+      '<input type="text" id="f-' + c.id + '" placeholder="Fundamento concreto (opcional)" aria-label="Fundamento concreto: ' + c.t + '" hidden>';
+    box.appendChild(el);
+  });
+
+  const limIds = ["minA","minM","minD","maxA","maxM","maxD"];
+  function loadCrime(id) {
+    const c = BY[id];
+    if (!c) return;
+    $("minA").value = c.min[0]; $("minM").value = c.min[1]; $("minD").value = c.min[2];
+    $("maxA").value = c.max[0]; $("maxM").value = c.max[1]; $("maxD").value = c.max[2];
+    $("especie").value = c.esp;
+  }
+
+  // ---------- Cálculo ----------
+  function calc() {
+    const v = id => { const x = parseInt($(id).value, 10); return isNaN(x) || x < 0 ? 0 : x; };
+    const min = toD(v("minA"), v("minM"), v("minD"));
+    const max = toD(v("maxA"), v("maxM"), v("maxD"));
+    const esp = $("especie").value;
+    const crit = (document.querySelector('input[name="crit"]:checked') || {}).value || "A";
+    const c = BY[sel.value];
+    const desf = CIRCS.filter(x => $("c-" + x.id).checked);
+    const n = desf.length;
+
+    CIRCS.forEach(x => {
+      const on = $("c-" + x.id).checked;
+      $("box-" + x.id).classList.toggle("on", on);
+      $("f-" + x.id).hidden = !on;
+      if (x.w) $("w-" + x.id).hidden = !on;
+    });
+    $("count").innerHTML = "<b>" + n + "</b> de 8 desfavoráveis";
+    $("cite").innerHTML = c
+      ? "<b>" + c.art + "</b><span>" + esc(c.nome) + " · " + esp + " de " + dur(min) + " a " + dur(max) + "</span>"
+      : "<b>Limites informados</b><span>" + esp + " de " + dur(min) + " a " + dur(max) + "</span>";
+
+    const err = $("err");
+    if (min <= 0 || max <= min) {
+      err.hidden = false;
+      err.textContent = min <= 0 ? "Informe uma pena mínima maior que zero." : "A pena máxima deve ser maior que a pena mínima.";
+      $("pb").textContent = "—"; $("pbesp").textContent = ""; $("pbsub").textContent = ""; $("memo").innerHTML = ""; $("minuta").textContent = ""; $("track").innerHTML = ""; $("fx").hidden = true;
+      return;
+    }
+    err.hidden = true;
+
+    const tm = (min + max) / 2;
+    let inc, teto, critTxt;
+    if (crit === "A") { inc = (tm - min) / 8; teto = tm; critTxt = "1/8 (um oitavo) do intervalo entre a pena mínima e o termo médio"; }
+    else if (crit === "B") { inc = (max - min) / 8; teto = max; critTxt = "1/8 (um oitavo) do intervalo entre as penas mínima e máxima cominadas"; }
+    else { inc = min / 6; teto = max; critTxt = "1/6 (um sexto) da pena mínima cominada"; }
+
+    const raw = min + n * inc;
+    const capped = Math.min(raw, teto);
+    const pb = Math.floor(capped + 1e-9);
+    const frac = capped - pb > 1e-9;
+
+    // Resultado principal
+    $("pb").textContent = dur(pb);
+    $("pbesp").textContent = "de " + esp;
+    $("pbsub").innerHTML = "<b>" + n + "</b> de 8 circunstâncias desfavoráveis" +
+      (n ? " · acréscimo de " + dur(pb - min) + " sobre o mínimo" : " · mínimo legal");
+
+    // Memória de cálculo
+    const art = c ? c.art + ", " + esp : esp;
+    const s = [];
+    s.push(["Limites em abstrato (" + art + ")", "mínimo de " + dur(min) + " · máximo de " + dur(max)]);
+    s.push(["Termo médio", "(" + dur(min) + " + " + dur(max) + ") ÷ 2 = <b>" + dur(tm) + "</b>"]);
+    if (crit === "A") {
+      s.push(["Intervalo entre o mínimo e o termo médio", dur(tm) + " − " + dur(min) + " = " + dur(tm - min) + " (" + meses(tm - min) + ")"]);
+      s.push(["Valor de cada circunstância", meses(tm - min) + " ÷ 8 = <b>" + meses(inc) + "</b> (" + dur(inc) + ")"]);
+    } else if (crit === "B") {
+      s.push(["Intervalo entre o mínimo e o máximo", dur(max) + " − " + dur(min) + " = " + dur(max - min) + " (" + meses(max - min) + ")"]);
+      s.push(["Valor de cada circunstância", meses(max - min) + " ÷ 8 = <b>" + meses(inc) + "</b> (" + dur(inc) + ")"]);
+    } else {
+      s.push(["Base da fração", "pena mínima de " + dur(min) + " (" + meses(min) + ")"]);
+      s.push(["Valor de cada circunstância", meses(min) + " ÷ 6 = <b>" + meses(inc) + "</b> (" + dur(inc) + ")"]);
+    }
+    s.push(["Circunstâncias desfavoráveis: " + n + " de 8", n ? n + " × " + meses(inc) + " = " + meses(n * inc) + " (" + dur(n * inc) + ")" : "nenhuma; a pena permanece no mínimo"]);
+    s.push(["Pena-base", dur(min) + (n ? " + " + dur(Math.min(n * inc, teto - min)) : "") + " = <b>" + dur(pb) + "</b>"]);
+    $("memo").innerHTML = s.map(x => '<li><span><span class="k">' + x[0] + '</span><span class="v">' + x[1] + "</span></span></li>").join("");
+
+    const fx = $("fx");
+    const notes = [];
+    if (raw > teto + 1e-9) notes.push("O acréscimo foi limitado ao teto da primeira fase (" + dur(teto) + ").");
+    if (frac) notes.push("Fração de dia desprezada (art. 11, CP): resultado exato de " + dur(capped) + ".");
+    fx.hidden = !notes.length; fx.textContent = notes.join(" ");
+
+    // Régua da pena
+    const pct = d => ((d - min) / (max - min)) * 100;
+    let h = '<div class="bar"></div>';
+    h += '<div class="zone" style="left:0;width:' + pct(teto) + '%"></div>';
+    h += '<div class="fill" style="width:' + pct(pb) + '%"></div>';
+    for (let k = 1; k <= 8; k++) { const t = min + k * inc; if (t <= teto + 1e-9) h += '<div class="tick" style="left:' + pct(t) + '%"></div>'; }
+    h += '<div class="mark" style="left:' + pct(pb) + '%" data-l="' + short(pb) + '"></div>';
+    h += '<span class="lab l" style="left:0">' + short(min) + "</span>";
+    h += '<span class="lab" style="left:' + pct(tm) + '%">TM ' + short(tm) + "</span>";
+    h += '<span class="lab r" style="left:100%">' + short(max) + "</span>";
+    $("track").innerHTML = h;
+
+    // Minuta
+    let txt;
+    if (!n) {
+      txt = "Na primeira fase da dosimetria, analisadas as circunstâncias judiciais do art. 59 do Código Penal, não se verificam vetoriais desfavoráveis ao réu, razão pela qual fixo a pena-base no mínimo legal, em " + durExt(pb) + " de " + esp + ".";
+    } else {
+      const lista = desf.map(x => { const f = $("f-" + x.id).value.trim(); return x.m + (f ? " (" + f + ")" : ""); });
+      txt = "Na primeira fase da dosimetria, analisadas as circunstâncias judiciais do art. 59 do Código Penal, reputo desfavoráve" + (n === 1 ? "l " : "is ") + joinE(lista) +
+        ", sendo neutras ou favoráveis as demais. Adotada a fração de " + critTxt + " para cada circunstância negativa, fixo a pena-base em " + durExt(pb) + " de " + esp + ".";
+    }
+    $("minuta").textContent = txt;
+    $("copied").hidden = true;
+  }
+
+  // ---------- Eventos ----------
+  sel.addEventListener("change", () => { if (sel.value !== "custom") loadCrime(sel.value); calc(); });
+  limIds.forEach(id => $(id).addEventListener("input", () => {
+    const c = BY[sel.value];
+    if (c) {
+      const same = [c.min[0], c.min[1], c.min[2], c.max[0], c.max[1], c.max[2]].every((val, k) => String(val) === String($(limIds[k]).value));
+      if (!same) sel.value = "custom";
+    }
+    calc();
+  }));
+  $("especie").addEventListener("change", calc);
+  document.querySelectorAll('input[name="crit"]').forEach(r => r.addEventListener("change", calc));
+  CIRCS.forEach(x => {
+    $("c-" + x.id).addEventListener("change", calc);
+    $("f-" + x.id).addEventListener("input", calc);
+  });
+  $("clear").addEventListener("click", () => { CIRCS.forEach(x => { $("c-" + x.id).checked = false; }); calc(); });
+
+  $("copy").addEventListener("click", () => {
+    const t = $("minuta").textContent;
+    const fallback = () => {
+      const r = document.createRange(); r.selectNodeContents($("minuta"));
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      $("copied").textContent = "Texto selecionado; use Ctrl+C"; $("copied").hidden = false;
+    };
+    try {
+      navigator.clipboard.writeText(t).then(() => { $("copied").textContent = "Texto copiado"; $("copied").hidden = false; }, fallback);
+    } catch (e) { fallback(); }
+  });
+
+  // ---------- Estado inicial: exemplo do homicídio simples com duas circunstâncias desfavoráveis ----------
+  sel.value = "121";
+  loadCrime("121");
+  $("c-culp").checked = true;
+  $("c-cons").checked = true;
+  calc();
+})();
+</script>
+
+</body></html>
